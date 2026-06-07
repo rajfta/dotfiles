@@ -1,0 +1,9 @@
+# macOS
+.DS_Store
+
+# Editor / local cruft
+*.swp
+*~
+
+# Symlink-target backups created by install.sh
+*.bak

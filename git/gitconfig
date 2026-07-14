@@ -1,0 +1,24 @@
+[user]
+	email = rajfta@gmail.com
+	name = rajfta
+[core]
+	editor = code --wait
+	pager = delta
+[init]
+	defaultBranch = main
+[pull]
+	rebase = true
+[interactive]
+	diffFilter = delta --color-only
+[delta]
+	navigate = true
+	side-by-side = true
+	line-numbers = true
+[merge]
+	conflictstyle = diff3
+[diff]
+	colorMoved = default
+
+# Work identity override: anything cloned under ~/work/ uses gitconfig-work instead.
+[includeIf "gitdir:~/work/"]
+	path = ~/.gitconfig-work

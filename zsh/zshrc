@@ -1,0 +1,56 @@
+# Path to your Oh My Zsh installation.
+export ZSH="$HOME/.oh-my-zsh"
+
+# Disable Oh My Zsh theme (using Starship instead)
+ZSH_THEME=""
+
+# Plugins
+plugins=(git zsh-autosuggestions zsh-syntax-highlighting)
+
+source $ZSH/oh-my-zsh.sh
+
+# Editor
+export EDITOR='code --wait'
+export VISUAL='code --wait'
+
+# nvm
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+
+# Add VSCode to PATH
+export PATH="$PATH:/Users/rajfta/Downloads/Visual Studio Code.app/Contents/Resources/app/bin"
+
+# Solana
+export PATH="$HOME/.local/share/solana/install/active_release/bin:$PATH"
+export PATH="$HOME/.local/bin:$PATH"
+
+# bun completions
+[ -s "/Users/rajfta/.bun/_bun" ] && source "/Users/rajfta/.bun/_bun"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
+
+# Aliases
+alias c='/Applications/Cursor.app/Contents/Resources/app/bin/cursor'
+alias p='pnpm'
+alias b='bun'
+alias ll='eza -la --icons --git'
+alias lt='eza --tree --level=2 --icons'
+alias cat='bat'
+alias ..='cd ..'
+alias ...='cd ../..'
+alias gs='git status'
+alias glog='git log --oneline --graph --decorate -20'
+alias lint='pnpm lint'
+alias types='pnpm check-types'
+
+# fzf
+eval "$(fzf --zsh)"
+
+# zoxide (smarter cd)
+eval "$(zoxide init zsh)"
+
+# Starship prompt (must be last)
+eval "$(starship init zsh)"

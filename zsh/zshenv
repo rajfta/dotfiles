@@ -1,0 +1,17 @@
+# Load nvm for all shell sessions (interactive and non-interactive)
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
+# Activate default Node.js version for non-interactive shells (e.g., Claude Code)
+if [[ ! -o interactive ]] && type nvm &>/dev/null; then
+  nvm use default --silent
+fi
+
+. "$HOME/.cargo/env"
+
+# Aliases available in all shells (interactive and non-interactive)
+alias c='/Applications/Cursor.app/Contents/Resources/app/bin/cursor'
+alias p='pnpm'
+alias b='bun'
+
+export PATH="$PATH:/Users/rajfta/.foundry/bin"

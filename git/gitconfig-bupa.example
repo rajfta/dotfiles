@@ -1,0 +1,8 @@
+[user]
+	email = TODO_BUPA_EMAIL
+	name = TODO_BUPA_NAME
+	signingkey = ~/.ssh/TODO_BUPA_KEY.pub
+[gpg]
+	format = ssh
+[commit]
+	gpgsign = true

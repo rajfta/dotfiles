@@ -7,11 +7,11 @@ if [[ ! -o interactive ]] && type nvm &>/dev/null; then
   nvm use default --silent
 fi
 
-. "$HOME/.cargo/env"
+[ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
 
 # Aliases available in all shells (interactive and non-interactive)
 alias c='/Applications/Cursor.app/Contents/Resources/app/bin/cursor'
 alias p='pnpm'
 alias b='bun'
 
-export PATH="$PATH:/Users/rajfta/.foundry/bin"
+export PATH="$PATH:$HOME/.foundry/bin"

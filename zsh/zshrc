@@ -19,14 +19,14 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 
 # Add VSCode to PATH
-export PATH="$PATH:/Users/rajfta/Downloads/Visual Studio Code.app/Contents/Resources/app/bin"
+export PATH="$PATH:$HOME/Downloads/Visual Studio Code.app/Contents/Resources/app/bin"
 
 # Solana
 export PATH="$HOME/.local/share/solana/install/active_release/bin:$PATH"
 export PATH="$HOME/.local/bin:$PATH"
 
 # bun completions
-[ -s "/Users/rajfta/.bun/_bun" ] && source "/Users/rajfta/.bun/_bun"
+[ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
 
 # bun
 export BUN_INSTALL="$HOME/.bun"

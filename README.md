@@ -15,7 +15,8 @@ locations in `$HOME`. Editing the symlinked file edits the file in this repo.
 | Zsh | `zsh/zprofile` | `~/.zprofile` |
 | [Ghostty](https://ghostty.org/) | `ghostty/config` | `~/.config/ghostty/config` |
 | Git | `git/gitconfig` | `~/.gitconfig` |
-| Git (work identity) | `git/gitconfig-work` | `~/.gitconfig-work` |
+| Git (PeakFS identity template) | `git/gitconfig-peakfs.example` | `~/.gitconfig-peakfs` (copy, untracked) |
+| Git (Bupa client identity template) | `git/gitconfig-bupa.example` | `~/.gitconfig-bupa` (copy, untracked) |
 | Git | `git/ignore` | `~/.config/git/ignore` |
 
 `.zshrc` pulls in [Starship](https://starship.rs) (prompt), plus `fzf` and
@@ -37,18 +38,31 @@ oh-my-zsh and its two custom plugins if they're missing.
 
 ### Work laptop: git identity
 
-`git/gitconfig` includes `git/gitconfig-work` for anything cloned under
-`~/work/`, so commits made there automatically use a separate identity
-instead of the personal one. Before committing from `~/work/`, fill in the
-placeholders in `~/.gitconfig-work` (i.e. `git/gitconfig-work` in this
-repo):
+`git/gitconfig` conditionally includes a separate identity file per work
+context — `~/work/peakfs/` and `~/work/bupa/` each get their own, instead of
+the personal identity:
 
-```sh
-$EDITOR ~/dotfiles/git/gitconfig-work
+```
+[includeIf "gitdir:~/work/peakfs/"]
+	path = ~/.gitconfig-peakfs
+[includeIf "gitdir:~/work/bupa/"]
+	path = ~/.gitconfig-bupa
 ```
 
-If you use a different directory for work repos, change the `includeIf
-"gitdir:~/work/"` path in `git/gitconfig` to match.
+`install.sh` seeds `~/.gitconfig-peakfs` / `~/.gitconfig-bupa` from the
+`.example` templates in this repo **the first time only** (it never
+overwrites an existing file). These are real, filled-in identity files
+outside the repo — they're gitignored by name so real names/emails/signing
+keys never get committed here. Fill them in after install:
+
+```sh
+$EDITOR ~/.gitconfig-peakfs   # adam.rajmuller@peakfs.io
+$EDITOR ~/.gitconfig-bupa     # your mfmbupa/Azure DevOps client email
+```
+
+Add more `includeIf`/template pairs the same way for any additional client
+or employer context. If you use different directories, update the
+`includeIf "gitdir:..."` paths in `git/gitconfig` to match.
 
 ## Hammerspoon hotkeys
 

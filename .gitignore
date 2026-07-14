@@ -7,3 +7,8 @@
 
 # Symlink-target backups created by install.sh
 *.bak
+
+# Real (filled-in) identity files — only the .example templates are tracked
+gitconfig-peakfs
+gitconfig-bupa
+gitconfig-work

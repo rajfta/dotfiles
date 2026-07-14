@@ -6,6 +6,22 @@ set -euo pipefail
 
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+# seed <template-in-repo> <target-in-home>
+# One-time copy (never a symlink): the target holds real identity data that
+# must never be tracked by this repo, so we don't touch it if it already exists.
+seed() {
+  local src="$DOTFILES_DIR/$1"
+  local dest="$2"
+
+  if [ -e "$dest" ]; then
+    echo "ok:   $dest already exists, leaving it alone"
+    return
+  fi
+
+  cp "$src" "$dest"
+  echo "seed: $dest (from $1 — fill in your real identity)"
+}
+
 # link <source-in-repo> <target-in-home>
 link() {
   local src="$DOTFILES_DIR/$1"
@@ -62,10 +78,14 @@ link "zsh/zprofile" "$HOME/.zprofile"
 link "ghostty/config" "$HOME/.config/ghostty/config"
 
 link "git/gitconfig" "$HOME/.gitconfig"
-link "git/gitconfig-work" "$HOME/.gitconfig-work"
 link "git/ignore" "$HOME/.config/git/ignore"
+
+mkdir -p "$HOME/work/peakfs" "$HOME/work/bupa"
+seed "git/gitconfig-peakfs.example" "$HOME/.gitconfig-peakfs"
+seed "git/gitconfig-bupa.example" "$HOME/.gitconfig-bupa"
 
 echo "Done."
 echo
-echo "Reminder: edit ~/.gitconfig-work (git/gitconfig-work in this repo) with your"
-echo "real work email/name before committing from anything under ~/work/."
+echo "Reminder: fill in real values in ~/.gitconfig-peakfs and ~/.gitconfig-bupa"
+echo "(name, email, signingkey) before committing from ~/work/peakfs/ or ~/work/bupa/."
+echo "These files are NOT tracked by this repo — only the .example templates are."

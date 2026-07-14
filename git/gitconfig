@@ -19,6 +19,8 @@
 [diff]
 	colorMoved = default
 
-# Work identity override: anything cloned under ~/work/ uses gitconfig-work instead.
-[includeIf "gitdir:~/work/"]
-	path = ~/.gitconfig-work
+# Work identity overrides: separate identity per client/employer context.
+[includeIf "gitdir:~/work/peakfs/"]
+	path = ~/.gitconfig-peakfs
+[includeIf "gitdir:~/work/bupa/"]
+	path = ~/.gitconfig-bupa

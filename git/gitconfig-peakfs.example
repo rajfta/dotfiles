@@ -1,0 +1,8 @@
+[user]
+	email = TODO_PEAKFS_EMAIL
+	name = TODO_PEAKFS_NAME
+	signingkey = ~/.ssh/TODO_PEAKFS_KEY.pub
+[gpg]
+	format = ssh
+[commit]
+	gpgsign = true

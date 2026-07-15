@@ -1,6 +1,39 @@
 require("hs.ipc")
 local spaces = require("hs.spaces")
 
+-- Per-Space wallpaper tint: color the desktop by which Space you're on, so a
+-- glance at any exposed background tells you where you are. macOS Tahoe no
+-- longer persists native per-Space wallpapers, so we set them dynamically on
+-- every Space change instead. Colors are keyed by Space position (1-4) per
+-- screen; images live in hammerspoon/wallpapers (symlinked into ~/.hammerspoon).
+local wallpaperDir = hs.configdir .. "/wallpapers/"
+local spaceWallpapers = {
+  wallpaperDir .. "space1-dusty-red.png",   -- Space 1
+  wallpaperDir .. "space2-sage-green.png",  -- Space 2
+  wallpaperDir .. "space3-slate-blue.png",  -- Space 3
+  wallpaperDir .. "space4-ochre.png",       -- Space 4
+}
+
+local function applySpaceWallpapers()
+  local active = spaces.activeSpaces() -- { screenUUID = spaceID }
+  if not active then return end
+  for _, screen in ipairs(hs.screen.allScreens()) do
+    local uuid = screen:getUUID()
+    local screenSpaces = spaces.spacesForScreen(uuid)
+    local current = active[uuid]
+    if screenSpaces and current then
+      local idx = hs.fnutils.indexOf(screenSpaces, current)
+      local img = idx and spaceWallpapers[idx]
+      if img then screen:desktopImageURL("file://" .. img) end
+    end
+  end
+end
+
+-- Global so the watcher isn't garbage-collected.
+spaceWallpaperWatcher = spaces.watcher.new(applySpaceWallpapers)
+spaceWallpaperWatcher:start()
+applySpaceWallpapers() -- paint the current Space on load
+
 -- Focus an already-running app, preferring a window on the current space.
 local function focusApp(app)
   local currentSpace = spaces.focusedSpace()

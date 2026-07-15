@@ -70,6 +70,7 @@ clone_plugin "https://github.com/zsh-users/zsh-autosuggestions" "zsh-autosuggest
 clone_plugin "https://github.com/zsh-users/zsh-syntax-highlighting" "zsh-syntax-highlighting"
 
 link "hammerspoon/init.lua" "$HOME/.hammerspoon/init.lua"
+link "hammerspoon/wallpapers" "$HOME/.hammerspoon/wallpapers"
 
 link "zsh/zshrc" "$HOME/.zshrc"
 link "zsh/zshenv" "$HOME/.zshenv"

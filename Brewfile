@@ -13,7 +13,8 @@ brew "zoxide"      # the "z" command -- eval "$(zoxide init zsh)" in zsh/zshrc
 brew "starship"    # eval "$(starship init zsh)" in zsh/zshrc
 brew "git-delta"   # core.pager/delta settings in git/gitconfig
 cask "ghostty"     # terminal itself, config in ghostty/config
-cask "hammerspoon" # window management, config in hammerspoon/init.lua
+cask "hammerspoon" # window management + per-Space wallpaper tint in hammerspoon/init.lua
+cask "spaceman"    # menu-bar Space indicator (Rectangles style); configured via `defaults`
 
 # --- general terminal tools, not referenced by config but commonly paired ---
 brew "ripgrep"     # fast grep, pairs well with fzf

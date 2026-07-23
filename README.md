@@ -18,6 +18,22 @@ locations in `$HOME`. Editing the symlinked file edits the file in this repo.
 | Git (PeakFS identity template) | `git/gitconfig-peakfs.example` | `~/.gitconfig-peakfs` (copy, untracked) |
 | Git (Bupa client identity template) | `git/gitconfig-bupa.example` | `~/.gitconfig-bupa` (copy, untracked) |
 | Git | `git/ignore` | `~/.config/git/ignore` |
+| Claude Code (status line) | `claude/statusline-command.sh` | `~/.claude/statusline-command.sh` |
+
+`~/.claude/settings.json` is **not** symlinked (it holds machine-local plugin
+and theme state), so on a new machine add this block to it manually to wire up
+the status line:
+
+```json
+"statusLine": {
+  "type": "command",
+  "command": "bash ~/.claude/statusline-command.sh"
+}
+```
+
+The script renders two lines: `~/dir  branch*` (dir + git branch, `*` = dirty
+working tree) and `Model · effort · ctx N%` (context % goes green → yellow →
+bold-red as it drops).
 
 `.zshrc` pulls in [Starship](https://starship.rs) (prompt), plus `fzf` and
 `zoxide` (the `z` command) at the bottom — order matters there, keep

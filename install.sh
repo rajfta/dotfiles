@@ -81,6 +81,8 @@ link "ghostty/config" "$HOME/.config/ghostty/config"
 link "git/gitconfig" "$HOME/.gitconfig"
 link "git/ignore" "$HOME/.config/git/ignore"
 
+link "claude/statusline-command.sh" "$HOME/.claude/statusline-command.sh"
+
 mkdir -p "$HOME/work/peakfs" "$HOME/work/bupa"
 seed "git/gitconfig-peakfs.example" "$HOME/.gitconfig-peakfs"
 seed "git/gitconfig-bupa.example" "$HOME/.gitconfig-bupa"

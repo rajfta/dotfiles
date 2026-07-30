@@ -1,1 +1,18 @@
 theme = TokyoNight Moon
+
+# Initial window size. Caps prose line length — Claude Code doesn't limit it
+# itself, and full-width paragraphs on a large display are hard to read.
+# Only the starting size; resizing still works normally.
+window-width = 130
+
+window-padding-x = 14
+window-padding-y = 8
+window-padding-balance = true
+
+# Extra leading. Helps separate code blocks from prose, since Claude Code
+# renders fenced code with no background or border.
+adjust-cell-height = 15%
+
+# Uncomment to disable programming ligatures (=> rendering as ⇒).
+# font-feature = -liga
+# font-feature = -calt

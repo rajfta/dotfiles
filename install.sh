@@ -82,6 +82,8 @@ link "git/gitconfig" "$HOME/.gitconfig"
 link "git/ignore" "$HOME/.config/git/ignore"
 
 link "claude/statusline-command.sh" "$HOME/.claude/statusline-command.sh"
+link "claude/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
+link "claude/themes/tailwind-theme.json" "$HOME/.claude/themes/tailwind-theme.json"
 
 mkdir -p "$HOME/work/peakfs" "$HOME/work/bupa"
 seed "git/gitconfig-peakfs.example" "$HOME/.gitconfig-peakfs"

@@ -1,0 +1,57 @@
+{
+  "name": "tailwind-theme",
+  "base": "dark",
+  "overrides": {
+    "text": "rgb(200,211,245)",
+    "subtle": "rgb(99,109,166)",
+    "inactive": "rgb(68,74,115)",
+
+    "claude": "rgb(255,150,108)",
+    "claudeShimmer": "rgb(255,185,150)",
+
+    "success": "rgb(195,232,141)",
+    "error": "rgb(255,117,127)",
+    "warning": "rgb(255,199,119)",
+    "warningShimmer": "rgb(255,220,165)",
+
+    "suggestion": "rgb(130,170,255)",
+    "permission": "rgb(130,170,255)",
+    "permissionShimmer": "rgb(154,184,255)",
+    "remember": "rgb(134,225,252)",
+    "planMode": "rgb(79,214,190)",
+    "ide": "rgb(130,170,255)",
+
+    "skill": "rgb(192,153,255)",
+    "autoAccept": "rgb(192,153,255)",
+    "autoAcceptShimmer": "rgb(202,171,255)",
+    "merged": "rgb(192,153,255)",
+    "effortUltra": "rgb(192,153,255)",
+
+    "bashBorder": "rgb(192,153,255)",
+    "promptBorder": "rgb(68,74,115)",
+    "promptBorderShimmer": "rgb(99,109,166)",
+
+    "diffAdded": "rgb(60,90,70)",
+    "diffRemoved": "rgb(95,60,70)",
+    "diffAddedDimmed": "rgb(45,62,52)",
+    "diffRemovedDimmed": "rgb(66,47,54)",
+    "diffAddedWord": "rgb(195,232,141)",
+    "diffRemovedWord": "rgb(255,117,127)",
+
+    "red_FOR_SUBAGENTS_ONLY": "rgb(255,117,127)",
+    "blue_FOR_SUBAGENTS_ONLY": "rgb(130,170,255)",
+    "green_FOR_SUBAGENTS_ONLY": "rgb(195,232,141)",
+    "yellow_FOR_SUBAGENTS_ONLY": "rgb(255,199,119)",
+    "purple_FOR_SUBAGENTS_ONLY": "rgb(192,153,255)",
+    "orange_FOR_SUBAGENTS_ONLY": "rgb(255,150,108)",
+    "pink_FOR_SUBAGENTS_ONLY": "rgb(252,167,234)",
+    "cyan_FOR_SUBAGENTS_ONLY": "rgb(134,225,252)",
+
+    "rate_limit_fill": "rgb(130,170,255)",
+    "rate_limit_empty": "rgb(52,58,92)",
+    "selectionBg": "rgb(59,74,120)",
+
+    "fastMode": "rgb(255,150,108)",
+    "fastModeShimmer": "rgb(255,185,150)"
+  }
+}

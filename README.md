@@ -19,21 +19,36 @@ locations in `$HOME`. Editing the symlinked file edits the file in this repo.
 | Git (Bupa client identity template) | `git/gitconfig-bupa.example` | `~/.gitconfig-bupa` (copy, untracked) |
 | Git | `git/ignore` | `~/.config/git/ignore` |
 | Claude Code (status line) | `claude/statusline-command.sh` | `~/.claude/statusline-command.sh` |
+| Claude Code (global instructions) | `claude/CLAUDE.md` | `~/.claude/CLAUDE.md` |
+| Claude Code (theme) | `claude/themes/tailwind-theme.json` | `~/.claude/themes/tailwind-theme.json` |
 
-`~/.claude/settings.json` is **not** symlinked (it holds machine-local plugin
-and theme state), so on a new machine add this block to it manually to wire up
-the status line:
+`~/.claude/settings.json` is **not** symlinked — Claude Code rewrites that file
+itself (changing model, theme or effort via `/config` rewrites it, which would
+clobber a symlink), and it holds machine-local plugin state. So on a new machine
+add these two keys to it manually to wire up the status line and the theme:
 
 ```json
 "statusLine": {
   "type": "command",
   "command": "bash ~/.claude/statusline-command.sh"
-}
+},
+"theme": "custom:tailwind-theme"
 ```
 
-The script renders two lines: `~/dir  branch*` (dir + git branch, `*` = dirty
-working tree) and `Model · effort · ctx N%` (context % goes green → yellow →
-bold-red as it drops).
+The status line script renders two lines: `~/dir  branch*` (dir + git branch,
+`*` = dirty working tree) and `Model · effort · ctx N%` (context % goes
+green → yellow → bold-red as it drops).
+
+`claude/CLAUDE.md` is global instructions loaded in **every** project — it tells
+Claude which markdown constructs actually render in the terminal (`##` only, no
+`---`, no footnotes, always tag code fences) and which to avoid.
+
+`claude/themes/tailwind-theme.json` is a `base: dark` theme with TokyoNight
+Moon–matched overrides, to sit with Ghostty's `TokyoNight Moon`. It restyles
+Claude Code's *chrome* only — borders, spinners, diffs, subagent colours,
+success/error/warning. The markdown body (headings, code-block backgrounds) has
+no theme keys and can't be recoloured; that's what `claude/CLAUDE.md` works
+around.
 
 `.zshrc` pulls in [Starship](https://starship.rs) (prompt), plus `fzf` and
 `zoxide` (the `z` command) at the bottom — order matters there, keep

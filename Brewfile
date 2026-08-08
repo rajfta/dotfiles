@@ -12,6 +12,7 @@ brew "fzf"        # eval "$(fzf --zsh)" in zsh/zshrc
 brew "zoxide"      # the "z" command -- eval "$(zoxide init zsh)" in zsh/zshrc
 brew "starship"    # eval "$(starship init zsh)" in zsh/zshrc
 brew "git-delta"   # core.pager/delta settings in git/gitconfig
+cask "visual-studio-code" # EDITOR/VISUAL in zsh/zshrc and core.editor in git/gitconfig
 cask "ghostty"     # terminal itself, config in ghostty/config
 cask "hammerspoon" # window management + per-Space wallpaper tint in hammerspoon/init.lua
 cask "spaceman"    # menu-bar Space indicator (Rectangles style); configured via `defaults`

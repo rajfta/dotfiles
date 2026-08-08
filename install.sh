@@ -6,6 +6,13 @@ set -euo pipefail
 
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+# Work identity contexts to set up on THIS machine, space separated. Each name
+# needs a git/gitconfig-<name>.example template in the repo and a matching
+# [includeIf "gitdir:~/work/<name>/"] block in git/gitconfig. Machines differ,
+# so override on the command line rather than editing this default:
+#   WORK_CONTEXTS="peakfs bupa" ./install.sh
+WORK_CONTEXTS="${WORK_CONTEXTS:-myedspace}"
+
 # seed <template-in-repo> <target-in-home>
 # One-time copy (never a symlink): the target holds real identity data that
 # must never be tracked by this repo, so we don't touch it if it already exists.
@@ -85,12 +92,20 @@ link "claude/statusline-command.sh" "$HOME/.claude/statusline-command.sh"
 link "claude/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
 link "claude/themes/tailwind-theme.json" "$HOME/.claude/themes/tailwind-theme.json"
 
-mkdir -p "$HOME/work/peakfs" "$HOME/work/bupa"
-seed "git/gitconfig-peakfs.example" "$HOME/.gitconfig-peakfs"
-seed "git/gitconfig-bupa.example" "$HOME/.gitconfig-bupa"
+for ctx in $WORK_CONTEXTS; do
+  template="git/gitconfig-$ctx.example"
+  if [ ! -e "$DOTFILES_DIR/$template" ]; then
+    echo "skip: no $template in repo for work context '$ctx'"
+    continue
+  fi
+  mkdir -p "$HOME/work/$ctx"
+  seed "$template" "$HOME/.gitconfig-$ctx"
+done
 
 echo "Done."
 echo
-echo "Reminder: fill in real values in ~/.gitconfig-peakfs and ~/.gitconfig-bupa"
-echo "(name, email, signingkey) before committing from ~/work/peakfs/ or ~/work/bupa/."
+echo "Reminder: fill in real values (name, email, signingkey) in:"
+for ctx in $WORK_CONTEXTS; do
+  echo "  ~/.gitconfig-$ctx   -> used for repos under ~/work/$ctx/"
+done
 echo "These files are NOT tracked by this repo — only the .example templates are."

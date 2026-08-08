@@ -18,8 +18,9 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 
-# Add VSCode to PATH
-export PATH="$PATH:$HOME/Downloads/Visual Studio Code.app/Contents/Resources/app/bin"
+# Add VSCode to PATH (Homebrew's cask already symlinks `code`; this covers a
+# manual /Applications install too)
+export PATH="$PATH:/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
 
 # Solana
 export PATH="$HOME/.local/share/solana/install/active_release/bin:$PATH"

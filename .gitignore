@@ -9,6 +9,5 @@
 *.bak
 
 # Real (filled-in) identity files — only the .example templates are tracked
-gitconfig-peakfs
-gitconfig-bupa
-gitconfig-work
+gitconfig-*
+!gitconfig-*.example

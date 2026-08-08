@@ -20,6 +20,11 @@
 	colorMoved = default
 
 # Work identity overrides: separate identity per client/employer context.
+# Not every context exists on every machine -- git silently ignores an include
+# whose path is missing, so listing them all here is safe. install.sh only
+# seeds the ones named in WORK_CONTEXTS for the machine it runs on.
+[includeIf "gitdir:~/work/myedspace/"]
+	path = ~/.gitconfig-myedspace
 [includeIf "gitdir:~/work/peakfs/"]
 	path = ~/.gitconfig-peakfs
 [includeIf "gitdir:~/work/bupa/"]

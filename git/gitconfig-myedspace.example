@@ -1,0 +1,8 @@
+[user]
+	email = TODO_MYEDSPACE_EMAIL
+	name = TODO_MYEDSPACE_NAME
+	signingkey = ~/.ssh/TODO_MYEDSPACE_KEY.pub
+[gpg]
+	format = ssh
+[commit]
+	gpgsign = true

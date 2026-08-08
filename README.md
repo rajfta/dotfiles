@@ -15,8 +15,7 @@ locations in `$HOME`. Editing the symlinked file edits the file in this repo.
 | Zsh | `zsh/zprofile` | `~/.zprofile` |
 | [Ghostty](https://ghostty.org/) | `ghostty/config` | `~/.config/ghostty/config` |
 | Git | `git/gitconfig` | `~/.gitconfig` |
-| Git (PeakFS identity template) | `git/gitconfig-peakfs.example` | `~/.gitconfig-peakfs` (copy, untracked) |
-| Git (Bupa client identity template) | `git/gitconfig-bupa.example` | `~/.gitconfig-bupa` (copy, untracked) |
+| Git (work identity templates) | `git/gitconfig-<context>.example` | `~/.gitconfig-<context>` (copy, untracked) |
 | Git | `git/ignore` | `~/.config/git/ignore` |
 | Claude Code (status line) | `claude/statusline-command.sh` | `~/.claude/statusline-command.sh` |
 | Claude Code (global instructions) | `claude/CLAUDE.md` | `~/.claude/CLAUDE.md` |
@@ -69,31 +68,37 @@ oh-my-zsh and its two custom plugins if they're missing.
 
 ### Work laptop: git identity
 
-`git/gitconfig` conditionally includes a separate identity file per work
-context — `~/work/peakfs/` and `~/work/bupa/` each get their own, instead of
-the personal identity:
+The personal identity in `git/gitconfig` (`rajfta@gmail.com`) is the default
+everywhere. `git/gitconfig` then conditionally overrides it per work context,
+so repos under `~/work/<context>/` commit as the right person:
 
 ```
-[includeIf "gitdir:~/work/peakfs/"]
-	path = ~/.gitconfig-peakfs
-[includeIf "gitdir:~/work/bupa/"]
-	path = ~/.gitconfig-bupa
+[includeIf "gitdir:~/work/myedspace/"]
+	path = ~/.gitconfig-myedspace
 ```
 
-`install.sh` seeds `~/.gitconfig-peakfs` / `~/.gitconfig-bupa` from the
-`.example` templates in this repo **the first time only** (it never
-overwrites an existing file). These are real, filled-in identity files
-outside the repo — they're gitignored by name so real names/emails/signing
-keys never get committed here. Fill them in after install:
+**Work context differs per machine**, so `git/gitconfig` lists an `includeIf`
+for every context across all machines (git silently ignores an include whose
+file doesn't exist), while `install.sh` only seeds the ones for the machine
+it's running on. That's the `WORK_CONTEXTS` variable at the top of the script:
+
+| Machine | Contexts |
+|---------|----------|
+| This laptop (default) | `myedspace` |
+| Previous machine | `peakfs bupa` — `WORK_CONTEXTS="peakfs bupa" ./install.sh` |
+
+Seeding is a one-time copy from the `.example` template — it never overwrites
+an existing file. The copies are real, filled-in identity files outside the
+repo; `.gitignore` covers `gitconfig-*` (excluding `*.example`) so real
+names/emails/signing keys can never be committed here. Fill in after install:
 
 ```sh
-$EDITOR ~/.gitconfig-peakfs   # adam.rajmuller@peakfs.io
-$EDITOR ~/.gitconfig-bupa     # your mfmbupa/Azure DevOps client email
+$EDITOR ~/.gitconfig-myedspace   # name, work email, signingkey
 ```
 
-Add more `includeIf`/template pairs the same way for any additional client
-or employer context. If you use different directories, update the
-`includeIf "gitdir:..."` paths in `git/gitconfig` to match.
+To add a context: drop a `git/gitconfig-<name>.example` in the repo, add the
+matching `includeIf "gitdir:~/work/<name>/"` block to `git/gitconfig`, and add
+`<name>` to `WORK_CONTEXTS`.
 
 ## Hammerspoon hotkeys
 

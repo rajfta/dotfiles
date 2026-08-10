@@ -92,19 +92,50 @@ local function cycleApps(bundleIDs)
   focusApp(target)
 end
 
-hs.hotkey.bind({"ctrl"}, "1", function()
+-- ctrl+1..5 collide with macOS's own "Switch to Desktop N" shortcuts. Disabling
+-- those in System Settings is not enough: the login session keeps the Carbon
+-- reservation until the next logout, so RegisterEventHotKey still fails with
+-- eventHotKeyExistsErr (-9878) and the binding silently never enables --
+-- which is what killed ctrl+4. Fall back to an event tap for any combo macOS
+-- won't hand over; once it does release the combo, the hotkey path wins again
+-- on its own with no change here.
+local allMods = {"cmd", "ctrl", "alt", "shift", "fn"}
+local fallbackTaps = {} -- keep references so the taps aren't garbage-collected
+
+local function bindKey(mods, key, fn)
+  if hs.hotkey.new(mods, key, fn):enable() then return end
+
+  local keyCode = hs.keycodes.map[key]
+  local wanted = {}
+  for _, mod in ipairs(mods) do wanted[mod] = true end
+
+  local tap = hs.eventtap.new({hs.eventtap.event.types.keyDown}, function(event)
+    if event:getKeyCode() ~= keyCode then return end
+    local flags = event:getFlags()
+    for _, mod in ipairs(allMods) do
+      -- normalise: getFlags() omits absent modifiers rather than setting false
+      if (flags[mod] and true or false) ~= (wanted[mod] or false) then return end
+    end
+    fn()
+    return true -- swallow it, matching hotkey behaviour
+  end)
+  tap:start()
+  table.insert(fallbackTaps, tap)
+end
+
+bindKey({"ctrl"}, "1", function()
   activateOrOpen("com.google.Chrome")
 end)
 
-hs.hotkey.bind({"ctrl"}, "2", function()
+bindKey({"ctrl"}, "2", function()
   activateOrOpen("com.microsoft.VSCode")
 end)
 
-hs.hotkey.bind({"ctrl"}, "3", function()
+bindKey({"ctrl"}, "3", function()
   activateOrOpen("com.mitchellh.ghostty")
 end)
 
-hs.hotkey.bind({"ctrl"}, "4", function()
+bindKey({"ctrl"}, "4", function()
   cycleApps({
     "notion.id",        -- Notion
     "com.apple.Notes",  -- Notes
@@ -112,7 +143,7 @@ hs.hotkey.bind({"ctrl"}, "4", function()
   })
 end)
 
-hs.hotkey.bind({"ctrl"}, "5", function()
+bindKey({"ctrl"}, "5", function()
   cycleApps({
     "com.hnc.Discord",            -- Discord
     "net.whatsapp.WhatsApp",      -- WhatsApp

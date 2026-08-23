@@ -136,11 +136,7 @@ bindKey({"ctrl"}, "3", function()
 end)
 
 bindKey({"ctrl"}, "4", function()
-  cycleApps({
-    "notion.id",        -- Notion
-    "com.apple.Notes",  -- Notes
-    "com.linear",       -- Linear
-  })
+  activateOrOpen("md.obsidian")
 end)
 
 bindKey({"ctrl"}, "5", function()

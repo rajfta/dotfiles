@@ -104,12 +104,12 @@ matching `includeIf "gitdir:~/work/<name>/"` block to `git/gitconfig`, and add
 
 App launchers (`ctrl`+number):
 
-- `ctrl+1` Chrome · `ctrl+2` VS Code · `ctrl+3` Ghostty
-- `ctrl+4` cycles through open **Notion → Notes → Linear**
+- `ctrl+1` Chrome · `ctrl+2` VS Code · `ctrl+3` Ghostty · `ctrl+4` Obsidian
 - `ctrl+5` cycles through open **Discord → WhatsApp → Telegram → Slack**
 
-The cycle hotkeys only touch apps that are already running — nothing is
-launched, and apps that are closed are skipped.
+The launcher hotkeys open the app if it isn't running. The cycle hotkey
+(`ctrl+5`) only touches apps that are already running — nothing is launched,
+and apps that are closed are skipped.
 
 Window grid: `ctrl+g` enters a mode where `q w e / a s d / z x c` snap the
 focused window to a 3×3 grid (chord cells to span), `return` to confirm,

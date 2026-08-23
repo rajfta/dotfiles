@@ -47,6 +47,19 @@ alias glog='git log --oneline --graph --decorate -20'
 alias lint='pnpm lint'
 alias types='pnpm check-types'
 
+# Second Brain
+brain() {
+  local vault="$HOME/Library/Mobile Documents/iCloud~md~obsidian/Documents/Second Brain"
+  cd "$vault" || return 1
+  # snapshot anything uncommitted so this session is always revertable
+  if [[ -n "$(git status --porcelain 2>/dev/null)" ]]; then
+    git add -A && git commit -qm "snapshot: before session $(date '+%Y-%m-%d %H:%M')" \
+      && echo "brain: snapshotted pending changes"
+    (git push -q origin main &>/dev/null &)
+  fi
+  claude "$@"
+}
+
 # fzf
 eval "$(fzf --zsh)"
 

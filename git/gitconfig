@@ -29,3 +29,9 @@
 	path = ~/.gitconfig-peakfs
 [includeIf "gitdir:~/work/bupa/"]
 	path = ~/.gitconfig-bupa
+[credential "https://github.com"]
+	helper = 
+	helper = !/opt/homebrew/bin/gh auth git-credential
+[credential "https://gist.github.com"]
+	helper = 
+	helper = !/opt/homebrew/bin/gh auth git-credential

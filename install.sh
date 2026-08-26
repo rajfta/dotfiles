@@ -91,6 +91,9 @@ link "git/ignore" "$HOME/.config/git/ignore"
 link "claude/statusline-command.sh" "$HOME/.claude/statusline-command.sh"
 link "claude/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
 link "claude/themes/tailwind-theme.json" "$HOME/.claude/themes/tailwind-theme.json"
+link "claude/skills/cerebro" "$HOME/.claude/skills/cerebro"
+link "claude/skills/grilling" "$HOME/.claude/skills/grilling"
+link "claude/skills/grill-me" "$HOME/.claude/skills/grill-me"
 
 # Supacode owns ~/.supacode/settings.json and rewrites it as you use the app,
 # so it can't be a symlink. Merge our tracked "global" block into it instead.

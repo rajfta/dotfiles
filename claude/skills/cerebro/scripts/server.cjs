@@ -147,7 +147,7 @@ let COOKIE_NAME = 'cerebro-key-' + PORT; // refined to the actual bound port in 
 const MIME_TYPES = {
   '.html': 'text/html', '.css': 'text/css', '.js': 'application/javascript',
   '.json': 'application/json', '.png': 'image/png', '.jpg': 'image/jpeg',
-  '.jpeg': 'image/jpeg', '.gif': 'image/gif', '.svg': 'image/svg+xml'
+  '.jpeg': 'image/jpeg', '.gif': 'image/gif', '.svg': 'image/svg+xml', '.webp': 'image/webp'
 };
 
 // ========== Templates and Constants ==========
@@ -214,7 +214,7 @@ function getNewestScreen() {
     .filter(f => !f.startsWith('.') && f.endsWith('.html'))
     .map(f => {
       const fp = path.join(CONTENT_DIR, f);
-      if (!isRegularFileInsideContentDir(fp)) return null;
+      if (!isRegularFileInside(CONTENT_DIR, fp)) return null;
       return { path: fp, mtime: fs.statSync(fp).mtime.getTime() };
     })
     .filter(Boolean)
@@ -246,19 +246,19 @@ function browserLauncherForPlatform(url, {
   return null;
 }
 
-function isRegularFileInsideContentDir(filePath) {
-  let stat, realContentDir, realFilePath;
+function isRegularFileInside(dir, filePath) {
+  let stat, realDir, realFilePath;
   try {
     stat = fs.lstatSync(filePath);
     if (stat.isSymbolicLink()) return false;
     if (!stat.isFile()) return false;
     if (stat.nlink !== 1) return false;
-    realContentDir = fs.realpathSync(CONTENT_DIR);
+    realDir = fs.realpathSync(dir);
     realFilePath = fs.realpathSync(filePath);
   } catch (e) {
     return false;
   }
-  return realFilePath.startsWith(realContentDir + path.sep);
+  return realFilePath.startsWith(realDir + path.sep);
 }
 
 // ========== Authentication ==========
@@ -327,6 +327,26 @@ function isAllowedWebSocketOrigin(req) {
   return origin === 'http://' + host;
 }
 
+// Serve one regular file from `dir` by basename. Rejects empty/dot names and
+// anything that isn't a regular file inside `dir` (symlinks, traversal, dirs).
+function serveFileFrom(dir, rawName, res) {
+  try {
+    const fileName = path.basename(decodeURIComponent(rawName));
+    const filePath = path.join(dir, fileName);
+    if (!fileName || fileName.startsWith('.') || !isRegularFileInside(dir, filePath)) {
+      res.writeHead(404, securityHeaders());
+      res.end('Not found');
+      return;
+    }
+    const ext = path.extname(filePath).toLowerCase();
+    res.writeHead(200, securityHeaders({ 'Content-Type': MIME_TYPES[ext] || 'application/octet-stream' }));
+    res.end(fs.readFileSync(filePath));
+  } catch (e) {
+    res.writeHead(404, securityHeaders());
+    res.end('Not found');
+  }
+}
+
 // ========== HTTP Request Handler ==========
 
 function handleRequest(req, res) {
@@ -363,19 +383,9 @@ function handleRequest(req, res) {
     res.writeHead(200, securityHeaders({ 'Content-Type': 'text/html; charset=utf-8' }));
     res.end(html);
   } else if (req.method === 'GET' && pathname.startsWith('/files/')) {
-    const fileName = path.basename(pathname.slice(7));
-    const filePath = path.join(CONTENT_DIR, fileName);
-    // Reject empty/dotfile names and anything that isn't a regular file —
-    // `/files/` would otherwise resolve to CONTENT_DIR and crash readFileSync (EISDIR).
-    if (!fileName || fileName.startsWith('.') || !isRegularFileInsideContentDir(filePath)) {
-      res.writeHead(404, securityHeaders());
-      res.end('Not found');
-      return;
-    }
-    const ext = path.extname(filePath).toLowerCase();
-    const contentType = MIME_TYPES[ext] || 'application/octet-stream';
-    res.writeHead(200, securityHeaders({ 'Content-Type': contentType }));
-    res.end(fs.readFileSync(filePath));
+    serveFileFrom(CONTENT_DIR, pathname.slice('/files/'.length), res);
+  } else if (req.method === 'GET' && pathname.startsWith('/inbox/')) {
+    serveFileFrom(INBOX_DIR, pathname.slice('/inbox/'.length), res);
   } else {
     res.writeHead(404, securityHeaders());
     res.end('Not found');

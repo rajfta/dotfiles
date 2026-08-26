@@ -128,11 +128,11 @@ bindKey({"ctrl"}, "1", function()
 end)
 
 bindKey({"ctrl"}, "2", function()
-  activateOrOpen("com.microsoft.VSCode")
+  activateOrOpen("app.supabit.supacode")
 end)
 
 bindKey({"ctrl"}, "3", function()
-  activateOrOpen("com.mitchellh.ghostty")
+  activateOrOpen("com.microsoft.VSCode")
 end)
 
 bindKey({"ctrl"}, "4", function()

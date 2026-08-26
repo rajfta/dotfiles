@@ -104,7 +104,7 @@ matching `includeIf "gitdir:~/work/<name>/"` block to `git/gitconfig`, and add
 
 App launchers (`ctrl`+number):
 
-- `ctrl+1` Chrome · `ctrl+2` VS Code · `ctrl+3` Ghostty · `ctrl+4` Obsidian
+- `ctrl+1` Chrome · `ctrl+2` supacode · `ctrl+3` VS Code · `ctrl+4` Obsidian
 - `ctrl+5` cycles through open **Discord → WhatsApp → Telegram → Slack**
 
 The launcher hotkeys open the app if it isn't running. The cycle hotkey

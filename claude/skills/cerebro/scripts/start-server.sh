@@ -149,8 +149,18 @@ cd "$SCRIPT_DIR" || exit 1
 # ephemeral shell instead of the real harness. Such a wrapper can pass
 # its own correctly-resolved value through CEREBRO_OWNER_PID_HINT to
 # skip our recomputation.
-if [[ -n "${CEREBRO_OWNER_PID_HINT:-}" ]]; then
-  OWNER_PID="$CEREBRO_OWNER_PID_HINT"
+#
+# CEREBRO_OWNER_PID_HINT is trusted operator/wrapper input, not validated
+# for *correctness* beyond "looks like a live PID": it must name the
+# process whose death should stop this server (normally the coding-agent
+# harness). We only guard against a garbled hint silently disabling the
+# watchdog (see server.cjs's ownerAlive()/`if (ownerPid)` gates); a
+# well-formed but wrong PID still re-couples server lifetime to whatever
+# that PID is, with the idle timeout as the only backstop — that can't be
+# caught here.
+OWNER_PID_HINT="${CEREBRO_OWNER_PID_HINT:-}"
+if [[ "$OWNER_PID_HINT" =~ ^[0-9]+$ && "$OWNER_PID_HINT" != "1" ]] && kill -0 "$OWNER_PID_HINT" 2>/dev/null; then
+  OWNER_PID="$OWNER_PID_HINT"
 else
   OWNER_PID="$(ps -o ppid= -p "$PPID" 2>/dev/null | tr -d ' ')"
   if [[ -z "$OWNER_PID" || "$OWNER_PID" == "1" ]]; then

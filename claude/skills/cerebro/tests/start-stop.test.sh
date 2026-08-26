@@ -41,5 +41,20 @@ check "server-stopped cleared on restart" '[[ ! -f "$expected/state/server-stopp
 err="$("$SCRIPTS/start-server.sh" 2>&1)"; check "no --topic and no --session-dir is an error" '[[ "$err" == *error* ]]'
 err="$("$SCRIPTS/start-server.sh" --topic 'Bad Topic!' 2>&1)"; check "topic must be a kebab slug" '[[ "$err" == *error* ]]'
 
+# 5. a garbled CEREBRO_OWNER_PID_HINT is rejected, not passed through.
+# server.cjs does `ownerPid = CEREBRO_OWNER_PID ? Number(CEREBRO_OWNER_PID) : null`;
+# a non-numeric hint becomes NaN, and ownerAlive()'s `if (!ownerPid) return true`
+# then treats the owner as permanently alive — silently disabling the death
+# watchdog for the process's whole life instead of erroring. Trace the script
+# to confirm it falls back to the auto-detected grandparent PID (a real
+# number) instead of forwarding the garbage string to node.
+hint_dir="$TMP/hint-bad"
+trace="$TMP/hint-trace.log"
+CEREBRO_OWNER_PID_HINT="not-a-pid" bash -x "$SCRIPTS/start-server.sh" --session-dir "$hint_dir" >/dev/null 2>"$trace"
+resolved_env="$(grep -oE 'CEREBRO_OWNER_PID=[^[:space:]]+' "$trace" | tail -1 | cut -d= -f2)"
+check "garbled CEREBRO_OWNER_PID_HINT falls back to a numeric CEREBRO_OWNER_PID for node" \
+  '[[ "$resolved_env" =~ ^[0-9]+$ ]]'
+"$SCRIPTS/stop-server.sh" "$hint_dir" >/dev/null
+
 rm -rf "$TMP"
 exit $fail

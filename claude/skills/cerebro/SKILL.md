@@ -23,6 +23,10 @@ No question, summary or other content in that message. If the answer is no, cont
 the terminal and **do not offer again in this conversation**. If yes, start a session.
 One offer per conversation, ever.
 
+**Not a layer.** Cerebro is its own session. Do not bolt a Cerebro screen onto a running
+`grilling` or `brainstorming` conversation — if the user wants the tab, start a Cerebro
+session and carry the decisions made so far into its first `tree.json`.
+
 ## Stance
 
 1. Walk every branch of the decision tree, resolving dependencies one by one.
@@ -41,8 +45,9 @@ One offer per conversation, ever.
    ```
    Keep `session_dir`, `screen_dir`, `state_dir`, `inbox_dir` and `url` from the JSON line
    it prints. The URL carries the session key — always give the user the **complete** URL.
-3. Write the first `state/tree.json` (see visual-guide.md): every decision you can already
-   see as `pending`, the first as `current`.
+3. Write the first `state/tree.json` with the Write tool — never a heredoc — (see
+   visual-guide.md): every decision you can already see as `pending`, the first as
+   `current`.
 4. Tell the user, in one short message: the URL; that the tab opens on the first screen;
    and that **images you should show must be files** — drop them into `inbox_dir`, or drag
    a file into the terminal and you will copy it there. A pasted image cannot be re-shown.
@@ -63,9 +68,9 @@ For each question:
    nothing to look at. A technical *topic* does not force the browser; a technical
    *shape* earns it.
 3. **If pushing a screen:** check the server is alive (`state/server-info` exists,
-   `state/server-stopped` does not — else restart with
-   `start-server.sh --session-dir <session_dir>`, same port, tab reconnects). Write a
-   content fragment to `screen_dir/<semantic-name>.html` with the Write tool (never a
+   `state/server-stopped` does not, and `kill -0 $(cat state/server.pid)` succeeds — else
+   restart with `start-server.sh --session-dir <session_dir>`, same port, tab reconnects).
+   Write a content fragment to `screen_dir/<semantic-name>.html` with the Write tool (never a
    heredoc — it floods the terminal). **Fresh filename every time** (`table-shape.html`,
    `table-shape-v2.html`); the newest file is what the tab shows. Mark your recommended
    option with `data-recommended`.

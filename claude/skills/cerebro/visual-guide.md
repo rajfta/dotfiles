@@ -71,7 +71,8 @@ HTML-escape `<`, `>` and `&` inside `<pre>` (`&lt;`, `&gt;`, `&amp;`).
 </div>
 ```
 
-Files must already be in `inbox/`. Name them so the caption and the filename agree.
+Files must already be in `inbox/`. Name them so the caption and the filename agree. They
+must be regular files — a symlink or Finder alias is refused with a 404.
 
 ### compare — code shapes side by side
 
@@ -141,7 +142,8 @@ You own this file. Rewrite it after every answer; the sidebar reloads by itself.
         { "id": "cadence", "title": "Fetch cadence", "state": "current" }
       ] },
     { "id": "shape", "title": "Table shape", "state": "pending" }
-  ]
+  ],
+  "followUps": ["Revisit the JSON column option if write volume triples"]
 }
 ```
 
@@ -149,6 +151,8 @@ You own this file. Rewrite it after every answer; the sidebar reloads by itself.
 - `children`: decisions that exist only because of the parent's answer.
 - Add nodes as answers reveal them; never delete one — mark it `resolved` with
   `"chosen": "n/a — <why it vanished>"` so the record stays honest.
+- `followUps`: things the user deferred; they become the *Open follow-ups* section of
+  `decisions.md`.
 
 ## The record: decisions.md
 
@@ -167,7 +171,7 @@ Written from `tree.json` at the end, to `<session_dir>/decisions.md`:
 **Chosen:** …
 
 ## Open follow-ups
-- <anything the user deferred, or "none">
+- <each entry of `followUps`, or "none">
 ```
 
 Number top-level nodes in order; children as `n.m`. Copy `rejected[].why` verbatim — it is

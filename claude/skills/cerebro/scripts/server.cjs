@@ -205,8 +205,26 @@ function isFullDocument(html) {
   return trimmed.startsWith('<!doctype') || trimmed.startsWith('<html');
 }
 
+// The decision tree Claude maintains in state/tree.json, embedded into the
+// frame as JSON for helper.js to render. Missing or invalid → null, never an error.
+function readTree() {
+  try {
+    return JSON.parse(fs.readFileSync(path.join(STATE_DIR, 'tree.json'), 'utf-8'));
+  } catch (e) {
+    return null;
+  }
+}
+
+function treeScriptTag() {
+  // "</" would end the script element early; < keeps the JSON valid and inert.
+  const json = JSON.stringify(readTree()).replace(/</g, '\\u003c');
+  return '<script id="cerebro-tree" type="application/json">' + json + '</script>';
+}
+
 function wrapInFrame(content) {
-  return renderBranding(frameTemplate).replace('<!-- CONTENT -->', content);
+  return renderBranding(frameTemplate)
+    .replace('<!-- TREE -->', treeScriptTag())
+    .replace('<!-- CONTENT -->', content);
 }
 
 function getNewestScreen() {
@@ -569,6 +587,20 @@ function startServer() {
   });
   watcher.on('error', (err) => console.error('fs.watch error:', err.message));
 
+  // tree.json changes without a new screen (Claude resolved a node) still
+  // deserve a refresh so the sidebar stays truthful.
+  const stateWatcher = fs.watch(STATE_DIR, (eventType, filename) => {
+    if (filename !== 'tree.json') return;
+    if (debounceTimers.has('state:tree.json')) clearTimeout(debounceTimers.get('state:tree.json'));
+    debounceTimers.set('state:tree.json', setTimeout(() => {
+      debounceTimers.delete('state:tree.json');
+      touchActivity();
+      console.log(JSON.stringify({ type: 'tree-updated' }));
+      broadcast({ type: 'reload' });
+    }, 100));
+  });
+  stateWatcher.on('error', (err) => console.error('fs.watch error:', err.message));
+
   function shutdown(reason) {
     console.log(JSON.stringify({ type: 'server-stopped', reason }));
     const infoFile = path.join(STATE_DIR, 'server-info');
@@ -578,6 +610,7 @@ function startServer() {
       JSON.stringify({ reason, timestamp: Date.now() }) + '\n'
     );
     watcher.close();
+    stateWatcher.close();
     clearInterval(lifecycleCheck);
     // Close any upgraded WebSocket sockets so server.close() can complete and
     // the process actually exits instead of lingering on an open connection.

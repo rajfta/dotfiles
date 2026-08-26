@@ -7,8 +7,32 @@
   function nextReconnectDelay(current, max) {
     return Math.min(current * 2, max);
   }
+
+  function escapeHtml(value) {
+    return String(value)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
+  // Pure: decision tree (state/tree.json) → sidebar HTML. Unknown states render as pending.
+  var TREE_ICONS = { resolved: '✓', current: '▶', pending: '○' };
+  function renderTree(tree) {
+    if (!tree || !Array.isArray(tree.nodes)) return '<p class="tree-empty">No decisions yet</p>';
+    var renderNode = function (n) {
+      var state = TREE_ICONS[n && n.state] ? n.state : 'pending';
+      var html = '<li class="node ' + state + '" data-id="' + escapeHtml(n.id || '') + '">' +
+        '<span class="icon">' + TREE_ICONS[state] + '</span>' +
+        '<span class="title">' + escapeHtml(n.title || '') + '</span>';
+      if (n.chosen) html += '<span class="chosen">' + escapeHtml(n.chosen) + '</span>';
+      if (Array.isArray(n.children) && n.children.length) html += '<ul>' + n.children.map(renderNode).join('') + '</ul>';
+      return html + '</li>';
+    };
+    return (tree.topic ? '<h3 class="tree-topic">' + escapeHtml(tree.topic) + '</h3>' : '') +
+      '<ul class="tree">' + tree.nodes.map(renderNode).join('') + '</ul>';
+  }
+
   if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { nextReconnectDelay, MIN_RECONNECT_MS, MAX_RECONNECT_MS, TOMBSTONE_AFTER_MS };
+    module.exports = { nextReconnectDelay, renderTree, escapeHtml, MIN_RECONNECT_MS, MAX_RECONNECT_MS, TOMBSTONE_AFTER_MS };
   }
 
   // Everything below is browser-only; bail out when loaded in Node (tests).
@@ -162,6 +186,16 @@
     send: sendEvent,
     choice: (value, metadata = {}) => sendEvent({ type: 'choice', value, ...metadata })
   };
+
+  // Render the decision tree the server embedded (absent on full-document screens).
+  (function mountTree() {
+    var data = document.getElementById('cerebro-tree');
+    var target = document.getElementById('tree');
+    if (!data || !target) return;
+    var tree = null;
+    try { tree = JSON.parse(data.textContent); } catch (e) {}
+    target.innerHTML = renderTree(tree);
+  })();
 
   connect();
 })();

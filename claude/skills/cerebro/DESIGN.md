@@ -196,3 +196,15 @@ existing untracked `grilling` and `grill-me` skills move into the repo the same 
   that exact hash is the accepted residual risk. Vendoring would remove it at the cost of
   ~3 MB in the dotfiles repo.
 - Syntax highlighting in `compare` panes (plain `<pre>`; revisit if it chafes).
+
+## Follow-ups (from the 2026-08-26 build review)
+
+Known rough edges, none blocking. Fix when they chafe.
+
+- `server.cjs` injects `helper.js` with a string `replace` on `</body>` — same `$`-pattern hazard as the one fixed in `wrapInFrame`; inert while `helper.js` contains no `$`. Use a function replacer if it ever does.
+- A `tree.json` change reloads the whole tab (discarding an unsent note); broadcasting the tree and re-rendering `#tree` in place would be gentler.
+- `serveFileFrom` accepts `CEREBRO_OWNER_PID_HINT` like `01` (regex passes); `kill -0` EPERM is treated as dead — both fail closed.
+- `tests/frame.test.js` is presence-only for CSS; visual correctness is covered by the demo (`demo/run-demo.sh`) and use.
+- The shell test's port-reuse check depends on the JSON key order `server.cjs` emits.
+- `INBOX_DIR` is exported from `server.cjs` but unused.
+- Stale screen files (`-v2`, `-v3`) are never cleaned up — deliberate, they are the record.

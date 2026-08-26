@@ -203,7 +203,7 @@ Known rough edges, none blocking. Fix when they chafe.
 
 - `server.cjs` injects `helper.js` with a string `replace` on `</body>` — same `$`-pattern hazard as the one fixed in `wrapInFrame`; inert while `helper.js` contains no `$`. Use a function replacer if it ever does.
 - A `tree.json` change reloads the whole tab (discarding an unsent note); broadcasting the tree and re-rendering `#tree` in place would be gentler.
-- `serveFileFrom` accepts `CEREBRO_OWNER_PID_HINT` like `01` (regex passes); `kill -0` EPERM is treated as dead — both fail closed.
+- `start-server.sh` accepts a `CEREBRO_OWNER_PID_HINT` like `01` (regex passes); `kill -0` EPERM is treated as dead — both fail closed.
 - `tests/frame.test.js` is presence-only for CSS; visual correctness is covered by the demo (`demo/run-demo.sh`) and use.
 - The shell test's port-reuse check depends on the JSON key order `server.cjs` emits.
 - `INBOX_DIR` is exported from `server.cjs` but unused.

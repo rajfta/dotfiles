@@ -191,5 +191,8 @@ existing untracked `grilling` and `grill-me` skills move into the repo the same 
 
 - Editing `grilling`, `grill-me` or `superpowers:brainstorming`.
 - Any spec/plan artefact beyond `decisions.md`.
-- Vendoring mermaid (CDN is acceptable for a local, normally-online page).
+- Vendoring mermaid. The CDN script is version-pinned with SRI and the page has a CSP
+  (`default-src 'self'`, script only from `cdn.jsdelivr.net`); a compromised package at
+  that exact hash is the accepted residual risk. Vendoring would remove it at the cost of
+  ~3 MB in the dotfiles repo.
 - Syntax highlighting in `compare` panes (plain `<pre>`; revisit if it chafes).

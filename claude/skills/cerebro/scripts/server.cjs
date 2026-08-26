@@ -337,6 +337,19 @@ function securityHeaders(headers = {}) {
   };
 }
 
+// Stricter CSP for the actual page responses (bootstrap page, waiting page,
+// screen page) — not /files/*, /inbox/*, or the 403/404 responses, which
+// carry only the blanket frame-ancestors policy above. 'unsafe-inline' is
+// needed for the bootstrap page's inline script/location.replace and for the
+// frame's own inline mermaid-init script; 'self' on connect-src also covers
+// same-origin ws:/wss: under CSP3, which is what the page's WebSocket needs.
+const PAGE_CSP = "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; " +
+  "style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'";
+
+function pageHeaders(headers = {}) {
+  return securityHeaders({ 'Content-Type': 'text/html; charset=utf-8', 'Content-Security-Policy': PAGE_CSP, ...headers });
+}
+
 function isAllowedWebSocketOrigin(req) {
   const origin = req.headers.origin;
   if (!origin) return true;
@@ -385,7 +398,7 @@ function handleRequest(req, res) {
   const pathname = pathnameOf(req.url);
   const keyFromQuery = queryKey(req.url);
   if (req.method === 'GET' && pathname === '/' && keyFromQuery && timingSafeEqualStr(keyFromQuery, TOKEN)) {
-    res.writeHead(200, securityHeaders({ 'Content-Type': 'text/html; charset=utf-8' }));
+    res.writeHead(200, pageHeaders());
     res.end(bootstrapPage(keyFromQuery));
   } else if (req.method === 'GET' && pathname === '/') {
     const screenFile = getNewestScreen();
@@ -399,7 +412,7 @@ function handleRequest(req, res) {
       html += helperInjection;
     }
 
-    res.writeHead(200, securityHeaders({ 'Content-Type': 'text/html; charset=utf-8' }));
+    res.writeHead(200, pageHeaders());
     res.end(html);
   } else if (req.method === 'GET' && pathname.startsWith('/files/')) {
     serveFileFrom(CONTENT_DIR, pathname.slice('/files/'.length), res);

@@ -102,7 +102,10 @@ Files must already be in `inbox/`. Name them so the caption and the filename agr
   Job --> MNB --> DB --> Kafka</pre>
 ```
 
-Mermaid loads from a CDN; offline the block shows its source text.
+Mermaid loads from a CDN; offline the block shows its source text. The script is
+version-pinned with an integrity hash and the page carries a CSP that blocks any other
+origin, but a screen still runs third-party code next to employer content — keep that in
+mind before pasting anything you would not paste into a browser tab.
 
 ### Typography
 

@@ -18,6 +18,7 @@ test('frame has the note form, the tree mount, both placeholders and the mermaid
   assert.match(frame, /<nav id="tree"/);
   assert.ok(frame.includes('<!-- CONTENT -->') && frame.includes('<!-- TREE -->') && frame.includes('<!-- BRANDING -->'));
   assert.match(frame, /cdn\.jsdelivr\.net\/npm\/mermaid@11/);
+  assert.match(frame, /integrity="sha384-/);
 });
 
 test('helper wires the note form and gallery selection', () => {

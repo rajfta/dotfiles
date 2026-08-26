@@ -21,8 +21,6 @@ locations in `$HOME`. Editing the symlinked file edits the file in this repo.
 | Claude Code (global instructions) | `claude/CLAUDE.md` | `~/.claude/CLAUDE.md` |
 | Claude Code (theme) | `claude/themes/tailwind-theme.json` | `~/.claude/themes/tailwind-theme.json` |
 | Claude Code (skill: cerebro) | `claude/skills/cerebro/` | `~/.claude/skills/cerebro` |
-| Claude Code (skill: grilling) | `claude/skills/grilling/` | `~/.claude/skills/grilling` |
-| Claude Code (skill: grill-me) | `claude/skills/grill-me/` | `~/.claude/skills/grill-me` |
 | [Supacode](https://supacode.sh/) | `supacode/settings.json` | `~/.supacode/settings.json` (merged, not linked — see below) |
 
 `~/.claude/settings.json` is **not** symlinked — Claude Code rewrites that file

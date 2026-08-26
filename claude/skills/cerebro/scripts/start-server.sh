@@ -199,7 +199,7 @@ cd "$SCRIPT_DIR" || exit 1
 # $PPID is the ephemeral shell the harness spawned to run us — it dies
 # when this script exits. The harness itself is $PPID's parent.
 #
-# A wrapper script (e.g. demo/run-demo.sh) that execs us adds one more
+# A wrapper script that execs us (an extra process layer) adds one more
 # process hop, which would make the grandparent resolve to that same
 # ephemeral shell instead of the real harness. Such a wrapper can pass
 # its own correctly-resolved value through CEREBRO_OWNER_PID_HINT to

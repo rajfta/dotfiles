@@ -3,7 +3,8 @@
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
 SCRIPTS="$HERE/../scripts"
-TMP="$(mktemp -d "${TMPDIR:-/tmp}/cerebro-startstop-XXXXXX")"
+TMP_BASE="${TMPDIR:-/tmp}"; TMP_BASE="${TMP_BASE%/}"
+TMP="$(mktemp -d "$TMP_BASE/cerebro-startstop-XXXXXX")"
 export CEREBRO_HOME="$TMP/home"
 fail=0
 ok()   { echo "ok   - $1"; }

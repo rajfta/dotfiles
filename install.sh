@@ -92,6 +92,12 @@ link "claude/statusline-command.sh" "$HOME/.claude/statusline-command.sh"
 link "claude/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
 link "claude/themes/tailwind-theme.json" "$HOME/.claude/themes/tailwind-theme.json"
 
+# Supacode owns ~/.supacode/settings.json and rewrites it as you use the app,
+# so it can't be a symlink. Merge our tracked "global" block into it instead.
+if [ -x "$DOTFILES_DIR/supacode/sync-settings.sh" ]; then
+  "$DOTFILES_DIR/supacode/sync-settings.sh" apply
+fi
+
 for ctx in $WORK_CONTEXTS; do
   template="git/gitconfig-$ctx.example"
   if [ ! -e "$DOTFILES_DIR/$template" ]; then

@@ -20,6 +20,7 @@ locations in `$HOME`. Editing the symlinked file edits the file in this repo.
 | Claude Code (status line) | `claude/statusline-command.sh` | `~/.claude/statusline-command.sh` |
 | Claude Code (global instructions) | `claude/CLAUDE.md` | `~/.claude/CLAUDE.md` |
 | Claude Code (theme) | `claude/themes/tailwind-theme.json` | `~/.claude/themes/tailwind-theme.json` |
+| [Supacode](https://supacode.sh/) | `supacode/settings.json` | `~/.supacode/settings.json` (merged, not linked — see below) |
 
 `~/.claude/settings.json` is **not** symlinked — Claude Code rewrites that file
 itself (changing model, theme or effort via `/config` rewrites it, which would
@@ -114,3 +115,29 @@ and apps that are closed are skipped.
 Window grid: `ctrl+g` enters a mode where `q w e / a s d / z x c` snap the
 focused window to a 3×3 grid (chord cells to span), `return` to confirm,
 `esc` to cancel.
+
+## Supacode settings
+
+Supacode is the daily driver, so its preferences and shortcut overrides live
+here too. Unlike everything else in this repo it is **not** symlinked: Supacode
+owns `~/.supacode/settings.json` and rewrites it as you work, and only part of
+that file is portable. We track just the `global` block — every toggle in the
+Settings UI, plus `shortcutOverrides` — and leave the machine-local parts
+(`repositoryRoots`, `repositories`, `pinnedWorktreeIDs`, and the sibling
+`sidebar.json` / `layouts.json` session state) alone.
+
+**Quit Supacode before running either direction** — it holds settings in memory
+and writes them back on quit, which would clobber an apply.
+
+```sh
+./supacode/sync-settings.sh pull    # after changing a setting in the UI, then commit
+./supacode/sync-settings.sh apply   # on the other laptop (install.sh does this too)
+```
+
+`apply` merges: this machine's repo list survives, as does any settings key a
+newer Supacode version added. `shortcutOverrides` is the exception — it is
+replaced wholesale, so removing a rebind here actually removes it there.
+
+Not covered: window geometry and onboarding flags in
+`~/Library/Preferences/app.supabit.supacode.plist`. That is local state, not
+configuration, so it stays per-machine.

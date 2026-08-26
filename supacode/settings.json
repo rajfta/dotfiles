@@ -1,0 +1,92 @@
+{
+  "global": {
+    "agentPresenceBadgesEnabled": true,
+    "analyticsEnabled": true,
+    "appVisibility": "dockAndMenuBar",
+    "appearanceMode": "dark",
+    "automatedActionPolicy": "cliOnly",
+    "confirmCloseSurface": true,
+    "confirmQuitMode": "auto",
+    "copyIgnoredOnWorktreeCreate": false,
+    "copyUntrackedOnWorktreeCreate": false,
+    "crashReportsEnabled": true,
+    "defaultEditorID": "vscode",
+    "deleteBranchOnDeleteWorktree": true,
+    "fetchOriginBeforeWorktreeCreation": true,
+    "githubIntegrationEnabled": true,
+    "globalScripts": [],
+    "inAppNotificationsEnabled": true,
+    "moveNotifiedWorktreeToTop": false,
+    "muteNotificationsForActiveSurface": true,
+    "notificationRetentionLimit": 200,
+    "notificationSound": "hero",
+    "promptForWorktreeCreation": true,
+    "pullRequestMergeStrategy": "merge",
+    "remoteSessionPersistenceEnabled": true,
+    "richAgentNotificationsEnabled": true,
+    "shortcutOverrides": {
+      "openWorktree": {
+        "isEnabled": true,
+        "keyCode": 14,
+        "modifiers": 1
+      },
+      "revealInSidebar": {
+        "isEnabled": true,
+        "keyCode": 15,
+        "modifiers": 5
+      },
+      "selectWorktree1": {
+        "isEnabled": true,
+        "keyCode": 18,
+        "modifiers": 5
+      },
+      "selectWorktree2": {
+        "isEnabled": true,
+        "keyCode": 19,
+        "modifiers": 5
+      },
+      "selectWorktree3": {
+        "isEnabled": true,
+        "keyCode": 20,
+        "modifiers": 5
+      },
+      "selectWorktree4": {
+        "isEnabled": true,
+        "keyCode": 21,
+        "modifiers": 5
+      },
+      "selectWorktree5": {
+        "isEnabled": true,
+        "keyCode": 23,
+        "modifiers": 5
+      },
+      "selectWorktree6": {
+        "isEnabled": true,
+        "keyCode": 22,
+        "modifiers": 5
+      },
+      "selectWorktree7": {
+        "isEnabled": true,
+        "keyCode": 26,
+        "modifiers": 5
+      },
+      "selectWorktree8": {
+        "isEnabled": true,
+        "keyCode": 28,
+        "modifiers": 5
+      },
+      "selectWorktree9": {
+        "isEnabled": true,
+        "keyCode": 25,
+        "modifiers": 5
+      }
+    },
+    "systemNotificationsEnabled": false,
+    "terminalHibernationEnabled": true,
+    "terminalThemeSyncEnabled": false,
+    "terminateSessionsOnQuit": false,
+    "updateChannel": "stable",
+    "updatesAutomaticallyCheckForUpdates": true,
+    "updatesAutomaticallyDownloadUpdates": false
+  }
+}

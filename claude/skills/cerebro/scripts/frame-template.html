@@ -4,7 +4,12 @@
   <meta charset="utf-8">
   <title>Cerebro</title>
   <style>
-    /* CEREBRO FRAME — layout, theme and component CSS. Content is injected at <!-- CONTENT -->. */
+    /* CEREBRO FRAME — layout, theme and component CSS. Content is injected
+       into the #frame-content marker comment further down this file. Do not
+       spell that marker out literally here: server.cjs's wrapInFrame() does
+       a plain (non-global) string replace on the first occurrence, so a
+       second copy of the exact marker text anywhere earlier in this file
+       — even inside a comment — silently steals the substitution. */
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { height: 100%; overflow: hidden; }

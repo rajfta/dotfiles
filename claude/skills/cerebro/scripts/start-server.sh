@@ -13,6 +13,10 @@
 #   --open                Auto-open the browser on the first screen.
 #   --foreground          Run server in the current terminal (no backgrounding).
 #   --background          Force background mode (overrides Codex auto-foreground).
+#
+# CEREBRO_OWNER_PID_HINT (env var) — for wrapper scripts only: overrides the
+# auto-detected owner PID used by the death watchdog (see comment above
+# OWNER_PID below).
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
@@ -139,9 +143,19 @@ cd "$SCRIPT_DIR" || exit 1
 # Resolve the harness PID (grandparent of this script).
 # $PPID is the ephemeral shell the harness spawned to run us — it dies
 # when this script exits. The harness itself is $PPID's parent.
-OWNER_PID="$(ps -o ppid= -p "$PPID" 2>/dev/null | tr -d ' ')"
-if [[ -z "$OWNER_PID" || "$OWNER_PID" == "1" ]]; then
-  OWNER_PID="$PPID"
+#
+# A wrapper script (e.g. demo/run-demo.sh) that execs us adds one more
+# process hop, which would make the grandparent resolve to that same
+# ephemeral shell instead of the real harness. Such a wrapper can pass
+# its own correctly-resolved value through CEREBRO_OWNER_PID_HINT to
+# skip our recomputation.
+if [[ -n "${CEREBRO_OWNER_PID_HINT:-}" ]]; then
+  OWNER_PID="$CEREBRO_OWNER_PID_HINT"
+else
+  OWNER_PID="$(ps -o ppid= -p "$PPID" 2>/dev/null | tr -d ' ')"
+  if [[ -z "$OWNER_PID" || "$OWNER_PID" == "1" ]]; then
+    OWNER_PID="$PPID"
+  fi
 fi
 
 # Windows/MSYS2: Node.js cannot see POSIX PIDs from the MSYS2 namespace.

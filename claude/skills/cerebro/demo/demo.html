@@ -1,0 +1,69 @@
+<h2>Which table shape for daily rates?</h2>
+<p class="subtitle">One row per (date, currency) vs one row per date with a JSON column. Recommended: A — it keeps Prisma queries and the outlier job trivial.</p>
+
+<div class="options">
+  <div class="option" data-choice="a" data-recommended onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content"><h3>Row per (date, currency)</h3><p>Composite unique key, indexable, plain SQL for outliers.</p></div>
+  </div>
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content"><h3>Row per date, rates as JSON</h3><p>One fetch = one insert; every read unpacks JSON.</p></div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="label">Shapes side by side</div>
+  <div class="compare">
+    <div class="pane"><div class="pane-title">A — schema.prisma</div><pre>model DailyRate {
+  date      DateTime @db.Date
+  currency  String   @db.VarChar(3)
+  rate      Decimal  @db.Decimal(18, 6)
+  <mark>@@id([date, currency])</mark>
+}</pre></div>
+    <div class="pane"><div class="pane-title">B — schema.prisma</div><pre>model DailyRates {
+  date   DateTime @id @db.Date
+  rates  Json
+}</pre></div>
+    <div class="pane"><div class="pane-title">Response DTO (both)</div><pre>export interface IGetDailyRatesResponseBody {
+  date: string;
+  rates: { currency: string; rate: string }[];
+}</pre></div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="label">Reference screenshots</div>
+  <div class="gallery">
+    <figure data-choice="design-a" data-recommended onclick="toggleSelect(this)"><img src="/inbox/pixel.png" alt="Design A"><figcaption>Design A <small>card grid, from Figma</small></figcaption></figure>
+    <figure data-choice="design-b" onclick="toggleSelect(this)"><img src="/inbox/pixel.png" alt="Design B"><figcaption>Design B <small>single table</small></figcaption></figure>
+  </div>
+</div>
+
+<div class="section">
+  <div class="label">Endpoints touched</div>
+  <table>
+    <thead><tr><th>Method</th><th>Path</th><th>Handler</th></tr></thead>
+    <tbody>
+      <tr><td>GET</td><td><code>/currency/rates?date=</code></td><td><code>GetDailyRatesQuery</code></td></tr>
+      <tr><td>POST</td><td><code>/currency/rates/replay</code></td><td><code>ReplayRatesCommand</code></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="section">
+  <div class="label">Flow</div>
+  <pre class="mermaid">sequenceDiagram
+  participant Job as FetchRatesJob
+  participant MNB
+  participant DB
+  Job->>MNB: GET arfolyamok.xml
+  MNB-->>Job: rates
+  Job->>DB: upsert DailyRate[]
+  Job-->>Kafka: RatesFetchedEvent</pre>
+</div>
+
+<div class="pros-cons">
+  <div class="pros"><h4>Pros of A</h4><ul><li>Indexed lookups</li><li>Outlier SQL is one query</li></ul></div>
+  <div class="cons"><h4>Cons of A</h4><ul><li>~30 rows/day instead of 1</li></ul></div>
+</div>

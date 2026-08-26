@@ -168,10 +168,10 @@
   window.selectedChoice = null;
 
   window.toggleSelect = function(el) {
-    const container = el.closest('.options') || el.closest('.cards');
+    const container = el.closest('.options') || el.closest('.cards') || el.closest('.gallery');
     const multi = container && container.dataset.multiselect !== undefined;
     if (container && !multi) {
-      container.querySelectorAll('.option, .card').forEach(o => o.classList.remove('selected'));
+      container.querySelectorAll('.option, .card, figure').forEach(o => o.classList.remove('selected'));
     }
     if (multi) {
       el.classList.toggle('selected');
@@ -182,10 +182,7 @@
   };
 
   // Expose API for explicit use
-  window.cerebro = {
-    send: sendEvent,
-    choice: (value, metadata = {}) => sendEvent({ type: 'choice', value, ...metadata })
-  };
+  window.cerebro = { send: sendEvent };
 
   // Render the decision tree the server embedded (absent on full-document screens).
   (function mountTree() {
@@ -195,6 +192,25 @@
     var tree = null;
     try { tree = JSON.parse(data.textContent); } catch (e) {}
     target.innerHTML = renderTree(tree);
+  })();
+
+  // Frame-provided note box: free text for Claude, recorded next to the clicks.
+  (function mountNoteForm() {
+    const form = document.getElementById('note-form');
+    const text = document.getElementById('note-text');
+    const status = form && form.querySelector('.note-status');
+    if (!form || !text) return;
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const value = text.value.trim();
+      if (!value) return;
+      sendEvent({ type: 'note', text: value });
+      text.value = '';
+      if (status) { status.textContent = 'Sent ✓ — answer in the terminal to continue'; setTimeout(() => { status.textContent = ''; }, 4000); }
+    });
+    text.addEventListener('keydown', (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') form.requestSubmit();
+    });
   })();
 
   connect();

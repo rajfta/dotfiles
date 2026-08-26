@@ -29,17 +29,20 @@
 
     @media (prefers-color-scheme: dark) {
       :root {
-        --bg-primary: #1d1d1f;
-        --bg-secondary: #2d2d2f;
-        --bg-tertiary: #3d3d3f;
-        --border: #424245;
-        --text-primary: #f5f5f7;
-        --text-secondary: #86868b;
-        --text-tertiary: #636366;
-        --accent: #0a84ff;
-        --accent-hover: #409cff;
-        --selected-bg: rgba(10, 132, 255, 0.15);
-        --selected-border: #0a84ff;
+        --bg-primary: #222436;
+        --bg-secondary: #1e2030;
+        --bg-tertiary: #2f334d;
+        --border: #3b4261;
+        --text-primary: #c8d3f5;
+        --text-secondary: #828bb8;
+        --text-tertiary: #636da6;
+        --accent: #82aaff;
+        --accent-hover: #89ddff;
+        --success: #c3e88d;
+        --warning: #ffc777;
+        --error: #ff757f;
+        --selected-bg: rgba(130, 170, 255, 0.14);
+        --selected-border: #82aaff;
       }
     }
 
@@ -75,8 +78,8 @@
     #tree .node.pending > .title { color: var(--text-secondary); }
     #tree .node > .chosen { display: block; margin-left: 1.2rem; color: var(--text-secondary); font-size: 0.78rem; }
     @media (max-width: 800px) { .shell { flex-direction: column; } #tree { width: auto; border-right: 0; border-bottom: 1px solid var(--border); } }
-    .main { flex: 1; overflow-y: auto; min-width: 0; }
-    #frame-content { padding: 2rem; min-height: 100%; }
+    .main { flex: 1; min-width: 0; display: flex; flex-direction: column; overflow: hidden; }
+    #frame-content { padding: 2rem; flex: 1; overflow-y: auto; }
 
     .header {
       background: var(--bg-secondary);
@@ -197,7 +200,64 @@
     .mock-content { padding: 1.5rem; flex: 1; }
     .mock-button { background: var(--accent); color: white; border: none; padding: 0.5rem 1rem; border-radius: 6px; font-size: 0.85rem; }
     .mock-input { background: var(--bg-primary); border: 1px solid var(--border); border-radius: 6px; padding: 0.5rem; width: 100%; }
+
+    /* ===== RECOMMENDED BADGE ===== */
+    .option[data-recommended] { border-style: dashed; }
+    .option[data-recommended] .content h3::after,
+    .gallery figure[data-recommended] figcaption::after {
+      content: 'recommended'; margin-left: 0.5rem; font-size: 0.65rem; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent);
+      border: 1px solid var(--accent); border-radius: 999px; padding: 0.05rem 0.45rem; vertical-align: middle;
+    }
+
+    /* ===== GALLERY (labelled reference images) ===== */
+    .gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+    .gallery figure {
+      margin: 0; background: var(--bg-secondary); border: 2px solid var(--border); border-radius: 12px;
+      overflow: hidden; cursor: pointer; transition: border-color 0.15s ease;
+    }
+    .gallery figure:hover { border-color: var(--accent); }
+    .gallery figure.selected { border-color: var(--selected-border); background: var(--selected-bg); }
+    .gallery img { display: block; width: 100%; height: auto; background: var(--bg-tertiary); }
+    .gallery figcaption { padding: 0.6rem 0.9rem; font-size: 0.85rem; font-weight: 600; }
+    .gallery figcaption small { display: block; font-weight: 400; color: var(--text-secondary); }
+
+    /* ===== COMPARE (code shapes side by side) ===== */
+    .compare { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+    .pane { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; min-width: 0; }
+    .pane-title { background: var(--bg-tertiary); padding: 0.5rem 1rem; font-size: 0.75rem; color: var(--text-secondary); border-bottom: 1px solid var(--border); }
+    .pane pre, pre.code {
+      margin: 0; padding: 1rem; overflow-x: auto; font-size: 0.8rem; line-height: 1.45;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--text-primary); tab-size: 2;
+    }
+    .pane mark { background: var(--selected-bg); color: inherit; outline: 1px solid var(--selected-border); border-radius: 3px; }
+
+    /* ===== TABLES ===== */
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-bottom: 1.5rem; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+    th, td { text-align: left; padding: 0.55rem 0.9rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { background: var(--bg-tertiary); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary); }
+    tr:last-child td { border-bottom: 0; }
+    td code, p code, li code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.85em; background: var(--bg-tertiary); padding: 0.05rem 0.35rem; border-radius: 4px; }
+
+    /* ===== MERMAID ===== */
+    pre.mermaid { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 12px; padding: 1rem; margin-bottom: 1.5rem; overflow-x: auto; }
+
+    /* ===== NOTE FORM (frame-provided) ===== */
+    .note { position: sticky; bottom: 0; background: var(--bg-secondary); border-top: 1px solid var(--border); padding: 0.75rem 2rem; }
+    .note textarea {
+      width: 100%; resize: vertical; background: var(--bg-primary); color: var(--text-primary);
+      border: 1px solid var(--border); border-radius: 8px; padding: 0.5rem 0.75rem; font: inherit; font-size: 0.85rem;
+    }
+    .note-row { display: flex; align-items: center; justify-content: flex-end; gap: 1rem; margin-top: 0.4rem; }
+    .note-status { font-size: 0.75rem; color: var(--text-secondary); }
+    .note button { background: var(--accent); color: white; border: 0; border-radius: 6px; padding: 0.4rem 0.9rem; font-size: 0.8rem; cursor: pointer; }
+    .note button:hover { background: var(--accent-hover); }
   </style>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    const dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    mermaid.initialize({ startOnLoad: true, theme: dark ? 'dark' : 'default', securityLevel: 'strict' });
+  </script>
 </head>
 <body>
   <div class="header">
@@ -211,6 +271,13 @@
       <div id="frame-content">
         <!-- CONTENT -->
       </div>
+      <form id="note-form" class="note" autocomplete="off">
+        <textarea id="note-text" rows="2" placeholder="Note for Claude — sent with your clicks. The terminal is still where you answer."></textarea>
+        <div class="note-row">
+          <span class="note-status" aria-live="polite"></span>
+          <button type="submit">Send note</button>
+        </div>
+      </form>
     </div>
   </div>
   <!-- TREE -->

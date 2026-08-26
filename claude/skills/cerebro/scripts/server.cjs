@@ -483,7 +483,9 @@ function handleMessage(text) {
   }
   touchActivity();
   console.log(JSON.stringify({ source: 'user-event', ...event }));
-  if (event && event.choice) {
+  const isClick = event && event.type === 'click' && event.choice;
+  const isNote = event && event.type === 'note' && typeof event.text === 'string' && event.text.trim();
+  if (isClick || isNote) {
     const eventsFile = path.join(STATE_DIR, 'events');
     fs.appendFileSync(eventsFile, JSON.stringify(event) + '\n');
   }

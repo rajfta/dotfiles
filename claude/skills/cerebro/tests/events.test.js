@@ -24,6 +24,13 @@ test('clicks and notes land in state/events; other messages do not', async () =>
     const lines = fs.readFileSync(path.join(dir, 'state', 'events'), 'utf-8').trim().split('\n').map(JSON.parse);
     assert.deepEqual(lines.map((e) => e.type), ['click', 'note']);
     assert.equal(lines[1].text, 'B but without the enum');
+
+    // A new screen appearing clears events — the tab is showing a fresh
+    // question, so a stale click/note from the previous one must not linger.
+    fs.mkdirSync(path.join(dir, 'content'), { recursive: true });
+    fs.writeFileSync(path.join(dir, 'content', 'next.html'), '<h2>next</h2>');
+    await sleep(300);
+    assert.equal(fs.existsSync(path.join(dir, 'state', 'events')), false);
   } finally {
     await stop(child);
     fs.rmSync(dir, { recursive: true, force: true });

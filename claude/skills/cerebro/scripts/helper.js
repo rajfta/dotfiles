@@ -19,7 +19,7 @@
   function renderTree(tree) {
     if (!tree || !Array.isArray(tree.nodes)) return '<p class="tree-empty">No decisions yet</p>';
     var renderNode = function (n) {
-      var state = TREE_ICONS[n && n.state] ? n.state : 'pending';
+      var state = (n && Object.prototype.hasOwnProperty.call(TREE_ICONS, n.state)) ? n.state : 'pending';
       var html = '<li class="node ' + state + '" data-id="' + escapeHtml(n.id || '') + '">' +
         '<span class="icon">' + TREE_ICONS[state] + '</span>' +
         '<span class="title">' + escapeHtml(n.title || '') + '</span>';

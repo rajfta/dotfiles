@@ -56,5 +56,21 @@ check "garbled CEREBRO_OWNER_PID_HINT falls back to a numeric CEREBRO_OWNER_PID 
   '[[ "$resolved_env" =~ ^[0-9]+$ ]]'
 "$SCRIPTS/stop-server.sh" "$hint_dir" >/dev/null
 
+# 6. start again on the same --session-dir WITHOUT stopping first: the old
+# server must be fully reaped before the new one binds, so the port is reused
+# (not a random fallback) and only one cerebro-server-id process survives.
+restart_dir="$TMP/restart-no-stop"
+out3="$("$SCRIPTS/start-server.sh" --session-dir "$restart_dir")"
+port_first="$(printf '%s' "$out3" | sed -n 's/.*"port":\([0-9]*\).*/\1/p')"
+out4="$("$SCRIPTS/start-server.sh" --session-dir "$restart_dir")"
+port_second="$(printf '%s' "$out4" | sed -n 's/.*"port":\([0-9]*\).*/\1/p')"
+check "restart without stopping first reuses the same port" \
+  '[[ -n "$port_first" && "$port_first" == "$port_second" ]]'
+server_id="$(cat "$restart_dir/state/server-instance-id" 2>/dev/null || true)"
+survivor_count="$(pgrep -f "cerebro-server-id=$server_id" 2>/dev/null | wc -l | tr -d ' ')"
+check "exactly one cerebro-server-id process survives the un-stopped restart" \
+  '[[ "$survivor_count" == "1" ]]'
+"$SCRIPTS/stop-server.sh" "$restart_dir" >/dev/null
+
 rm -rf "$TMP"
 exit $fail

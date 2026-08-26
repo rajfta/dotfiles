@@ -18,7 +18,7 @@ if [[ -z "$OWNER_PID_HINT" || "$OWNER_PID_HINT" == "1" ]]; then
 fi
 export CEREBRO_OWNER_PID_HINT="$OWNER_PID_HINT"
 
-out="$("$HERE/../scripts/start-server.sh" --topic demo --open)"
+out="$("$HERE/../scripts/start-server.sh" --topic demo --open)" || { echo "$out"; exit 1; }
 echo "$out"
 session="$(printf '%s' "$out" | sed -n 's/.*"session_dir":"\([^"]*\)".*/\1/p')"
 [[ -n "$session" ]] || { echo "could not parse session_dir"; exit 1; }

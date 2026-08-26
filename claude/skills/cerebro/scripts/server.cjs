@@ -223,8 +223,8 @@ function treeScriptTag() {
 
 function wrapInFrame(content) {
   return renderBranding(frameTemplate)
-    .replace('<!-- TREE -->', treeScriptTag())
-    .replace('<!-- CONTENT -->', content);
+    .replace('<!-- TREE -->', () => treeScriptTag())
+    .replace('<!-- CONTENT -->', () => content);
 }
 
 function getNewestScreen() {
@@ -357,8 +357,9 @@ function serveFileFrom(dir, rawName, res) {
       return;
     }
     const ext = path.extname(filePath).toLowerCase();
+    const data = fs.readFileSync(filePath);
     res.writeHead(200, securityHeaders({ 'Content-Type': MIME_TYPES[ext] || 'application/octet-stream' }));
-    res.end(fs.readFileSync(filePath));
+    res.end(data);
   } catch (e) {
     res.writeHead(404, securityHeaders());
     res.end('Not found');
@@ -621,6 +622,9 @@ function startServer() {
     }
     server.close(() => process.exit(0));
   }
+
+  process.on('SIGTERM', () => shutdown('signal'));
+  process.on('SIGINT', () => shutdown('signal'));
 
   function ownerAlive() {
     if (!ownerPid) return true;

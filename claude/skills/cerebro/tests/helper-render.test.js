@@ -35,3 +35,9 @@ test('renderTree tolerates null, garbage and unknown states', () => {
   assert.match(renderTree({ nodes: 'nope' }), /tree-empty/);
   assert.match(renderTree({ nodes: [{ title: 'x', state: 'weird' }] }), /node pending/);
 });
+
+test('renderTree treats an Object.prototype state as pending, not inherited', () => {
+  const html = renderTree({ nodes: [{ title: 'x', state: 'constructor' }] });
+  assert.match(html, /node pending/);
+  assert.doesNotMatch(html, /native code/);
+});

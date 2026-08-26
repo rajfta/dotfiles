@@ -121,6 +121,14 @@ SERVER_ID_FILE="${STATE_DIR}/server-instance-id"
 mkdir -p "${SESSION_DIR}/content" "${SESSION_DIR}/inbox" "$STATE_DIR"
 rm -f "${STATE_DIR}/server-stopped"
 
+# Capture the OUTGOING server's id (if any) before we overwrite the id file
+# with a new one below — we need it to prove the PID in server.pid really is
+# that prior server, same as stop-server.sh's own check.
+OLD_SERVER_ID=""
+if [[ -f "$SERVER_ID_FILE" ]]; then
+  OLD_SERVER_ID="$(tr -d '\r\n' < "$SERVER_ID_FILE" 2>/dev/null || true)"
+fi
+
 SERVER_ID=""
 if [[ -r /dev/urandom ]]; then
   SERVER_ID="$(od -An -N24 -tx1 /dev/urandom 2>/dev/null | tr -d ' \n' || true)"
@@ -131,10 +139,57 @@ fi
 printf '%s\n' "$SERVER_ID" > "$SERVER_ID_FILE"
 chmod 600 "$SERVER_ID_FILE" 2>/dev/null || true
 
-# Kill any existing server
+# Command line of a PID, POSIX /proc where available else ps (mirrors stop-server.sh).
+old_server_command_line_for_pid() {
+  local pid="$1"
+  if [[ -r "/proc/$pid/cmdline" ]]; then
+    tr '\0' '\n' < "/proc/$pid/cmdline" 2>/dev/null || true
+    return 0
+  fi
+  ps -ww -p "$pid" -o command= 2>/dev/null || ps -f -p "$pid" 2>/dev/null | sed '1d' || true
+}
+
+# True if $1 is alive and its command line proves it is a Cerebro server for
+# this session: carrying the exact prior --cerebro-server-id= when we know it,
+# or (id file was missing/unreadable) any --cerebro-server-id= flag at all.
+# Never signal a PID that fails this — a stale pid file may point at an
+# unrelated process after a reboot or PID wraparound.
+pid_is_cerebro_server() {
+  local pid="$1"
+  kill -0 "$pid" 2>/dev/null || return 1
+  local command_line
+  command_line="$(old_server_command_line_for_pid "$pid")"
+  [[ -n "$command_line" ]] || return 1
+  if [[ -n "$OLD_SERVER_ID" ]]; then
+    local expected_arg="--cerebro-server-id=$OLD_SERVER_ID"
+    case "$command_line" in
+      *"$expected_arg"*) return 0 ;;
+      *) return 1 ;;
+    esac
+  else
+    case "$command_line" in
+      *"--cerebro-server-id="*) return 0 ;;
+      *) return 1 ;;
+    esac
+  fi
+}
+
+# Kill any existing server, and wait for it to actually be gone before we bind
+# the same port — otherwise a restart can race the old process off a port it
+# still holds and land on a random fallback port instead of reusing it.
 if [[ -f "$PID_FILE" ]]; then
   old_pid=$(cat "$PID_FILE")
-  kill "$old_pid" 2>/dev/null
+  if pid_is_cerebro_server "$old_pid"; then
+    kill "$old_pid" 2>/dev/null || true
+    for _ in {1..20}; do
+      kill -0 "$old_pid" 2>/dev/null || break
+      sleep 0.1
+    done
+    if kill -0 "$old_pid" 2>/dev/null; then
+      kill -9 "$old_pid" 2>/dev/null || true
+      sleep 0.1
+    fi
+  fi
   rm -f "$PID_FILE"
 fi
 

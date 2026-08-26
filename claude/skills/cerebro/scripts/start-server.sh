@@ -1,13 +1,11 @@
 #!/usr/bin/env bash
 # Start the Cerebro server and output connection info
-# Usage: start-server.sh [--project-dir <path>] [--host <bind-host>] [--url-host <display-host>] [--foreground] [--background]
+# Usage: start-server.sh (--topic <kebab-slug> | --session-dir <path>) [--open] [--host <bind-host>] [--url-host <display-host>] [--idle-timeout-minutes <n>] [--foreground|--background]
 #
-# Starts server on a random high port, outputs JSON with URL.
-# Each session gets its own directory to avoid conflicts.
+# New session: --topic creates <CEREBRO_HOME or ~/.cerebro>/sessions/<basename $PWD>/<YYYY-MM-DD>-<topic>/{content,inbox,state}.
+# Restart:     --session-dir <that path> reuses the same port and key so the open tab reconnects.
 #
 # Options:
-#   --project-dir <path>  Store session files under <path>/.cerebro/
-#                         instead of /tmp. Files persist after server stops.
 #   --host <bind-host>    Host/interface to bind (default: 127.0.0.1).
 #                         Use 0.0.0.0 in remote/containerized environments.
 #   --url-host <host>     Hostname shown in returned URL JSON.
@@ -18,8 +16,13 @@
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
+# Capture the caller's project before any cd: the project slug is its basename.
+PROJECT_SLUG="$(basename "$PWD")"
+CEREBRO_HOME="${CEREBRO_HOME:-$HOME/.cerebro}"
+
 # Parse arguments
-PROJECT_DIR=""
+TOPIC=""
+SESSION_DIR=""
 FOREGROUND="false"
 FORCE_BACKGROUND="false"
 BIND_HOST="127.0.0.1"
@@ -27,40 +30,26 @@ URL_HOST=""
 IDLE_TIMEOUT_MINUTES=""
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --project-dir)
-      PROJECT_DIR="$2"
-      shift 2
-      ;;
-    --host)
-      BIND_HOST="$2"
-      shift 2
-      ;;
-    --url-host)
-      URL_HOST="$2"
-      shift 2
-      ;;
-    --idle-timeout-minutes)
-      IDLE_TIMEOUT_MINUTES="$2"
-      shift 2
-      ;;
-    --open)
-      export CEREBRO_OPEN=1
-      shift
-      ;;
-    --foreground|--no-daemon)
-      FOREGROUND="true"
-      shift
-      ;;
-    --background|--daemon)
-      FORCE_BACKGROUND="true"
-      shift
-      ;;
-    *)
-      echo "{\"error\": \"Unknown argument: $1\"}"
-      exit 1
-      ;;
+    --topic)        TOPIC="$2"; shift 2 ;;
+    --session-dir)  SESSION_DIR="$2"; shift 2 ;;
+    --host)         BIND_HOST="$2"; shift 2 ;;
+    --url-host)     URL_HOST="$2"; shift 2 ;;
+    --idle-timeout-minutes) IDLE_TIMEOUT_MINUTES="$2"; shift 2 ;;
+    --open)         export CEREBRO_OPEN=1; shift ;;
+    --foreground|--no-daemon) FOREGROUND="true"; shift ;;
+    --background|--daemon)    FORCE_BACKGROUND="true"; shift ;;
+    *) echo "{\"error\": \"Unknown argument: $1\"}"; exit 1 ;;
   esac
 done
+
+if [[ -z "$SESSION_DIR" && -z "$TOPIC" ]]; then
+  echo '{"error": "Pass --topic <kebab-slug> (new session) or --session-dir <path> (restart)"}'
+  exit 1
+fi
+if [[ -n "$TOPIC" && ! "$TOPIC" =~ ^[a-z0-9]+(-[a-z0-9]+)*$ ]]; then
+  echo '{"error": "--topic must be a kebab-case slug, e.g. rate-source"}'
+  exit 1
+fi
 
 if [[ -z "$URL_HOST" ]]; then
   if [[ "$BIND_HOST" == "127.0.0.1" || "$BIND_HOST" == "localhost" ]]; then
@@ -93,12 +82,9 @@ is_windows_like_shell() {
   return 1
 }
 
-# Some environments reap detached/background processes. Auto-foreground when detected.
 if [[ -n "${CODEX_CI:-}" && "$FOREGROUND" != "true" && "$FORCE_BACKGROUND" != "true" ]]; then
   FOREGROUND="true"
 fi
-
-# Windows/Git Bash reaps nohup background processes. Auto-foreground when detected.
 if [[ "$FOREGROUND" != "true" && "$FORCE_BACKGROUND" != "true" ]]; then
   if is_windows_like_shell; then
     FOREGROUND="true"
@@ -109,26 +95,27 @@ fi
 # keep everything this script and the server create owner-only.
 umask 077
 
-# Generate unique session directory
-SESSION_ID="$$-$(date +%s)"
-
-if [[ -n "$PROJECT_DIR" ]]; then
-  SESSION_DIR="${PROJECT_DIR}/.cerebro/${SESSION_ID}"
-  # Persist the bound port and key per project so a restart reuses them and an
-  # already-open browser tab reconnects to the same URL with a valid cookie.
-  export CEREBRO_PORT_FILE="${PROJECT_DIR}/.cerebro/.last-port"
-  export CEREBRO_TOKEN_FILE="${PROJECT_DIR}/.cerebro/.last-token"
+# Session directory: explicit --session-dir (restart), else deterministic
+# <home>/sessions/<project>/<date>-<topic>. Reusing an existing dir is fine —
+# the newest screen wins and the tab reconnects.
+PROJECT_ROOT="$CEREBRO_HOME/sessions/$PROJECT_SLUG"
+if [[ -z "$SESSION_DIR" ]]; then
+  SESSION_DIR="$PROJECT_ROOT/$(date +%Y-%m-%d)-$TOPIC"
 else
-  SESSION_DIR="/tmp/cerebro-${SESSION_ID}"
+  PROJECT_ROOT="$(dirname "$SESSION_DIR")"
 fi
+# Persist the bound port and key per project so a restart reuses them and an
+# already-open browser tab reconnects to the same URL with a valid cookie.
+export CEREBRO_PORT_FILE="$PROJECT_ROOT/.last-port"
+export CEREBRO_TOKEN_FILE="$PROJECT_ROOT/.last-token"
 
 STATE_DIR="${SESSION_DIR}/state"
 PID_FILE="${STATE_DIR}/server.pid"
 LOG_FILE="${STATE_DIR}/server.log"
 SERVER_ID_FILE="${STATE_DIR}/server-instance-id"
 
-# Create fresh session directory with content and state peers
-mkdir -p "${SESSION_DIR}/content" "$STATE_DIR"
+mkdir -p "${SESSION_DIR}/content" "${SESSION_DIR}/inbox" "$STATE_DIR"
+rm -f "${STATE_DIR}/server-stopped"
 
 SERVER_ID=""
 if [[ -r /dev/urandom ]]; then
@@ -194,7 +181,7 @@ for _ in {1..50}; do
       sleep 0.1
     done
     if [[ "$alive" != "true" ]]; then
-      echo "{\"error\": \"Server started but was killed. Retry in a persistent terminal with: $SCRIPT_DIR/start-server.sh${PROJECT_DIR:+ --project-dir $PROJECT_DIR} --host $BIND_HOST --url-host $URL_HOST --foreground\"}"
+      echo "{\"error\": \"Server started but was killed. Retry in a persistent terminal with: $SCRIPT_DIR/start-server.sh --session-dir $SESSION_DIR --host $BIND_HOST --url-host $URL_HOST --foreground\"}"
       exit 1
     fi
     grep "server-started" "$LOG_FILE" | head -1

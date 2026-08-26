@@ -103,6 +103,7 @@ const URL_HOST = process.env.CEREBRO_URL_HOST || (HOST === '127.0.0.1' ? 'localh
 const SESSION_DIR = process.env.CEREBRO_DIR || '/tmp/cerebro';
 const CONTENT_DIR = path.join(SESSION_DIR, 'content');
 const STATE_DIR = path.join(SESSION_DIR, 'state');
+const INBOX_DIR = path.join(SESSION_DIR, 'inbox');
 let ownerPid = process.env.CEREBRO_OWNER_PID ? Number(process.env.CEREBRO_OWNER_PID) : null;
 
 // Per-session secret key. The companion is reachable by any local browser tab
@@ -520,6 +521,7 @@ const debounceTimers = new Map();
 function startServer() {
   if (!fs.existsSync(CONTENT_DIR)) fs.mkdirSync(CONTENT_DIR, { recursive: true });
   if (!fs.existsSync(STATE_DIR)) fs.mkdirSync(STATE_DIR, { recursive: true });
+  if (!fs.existsSync(INBOX_DIR)) fs.mkdirSync(INBOX_DIR, { recursive: true });
 
   // Track known files to distinguish new screens from updates.
   // macOS fs.watch reports 'rename' for both new files and overwrites,
@@ -625,7 +627,8 @@ function startServer() {
     const info = JSON.stringify({
       type: 'server-started', port: Number(PORT), host: HOST,
       url_host: URL_HOST, url: companionUrl(),
-      screen_dir: CONTENT_DIR, state_dir: STATE_DIR, idle_timeout_ms: IDLE_TIMEOUT_MS
+      session_dir: SESSION_DIR, screen_dir: CONTENT_DIR, state_dir: STATE_DIR, inbox_dir: INBOX_DIR,
+      idle_timeout_ms: IDLE_TIMEOUT_MS
     });
     console.log(info);
     // server-info embeds the key — keep it owner-only.
@@ -663,5 +666,6 @@ module.exports = {
   decodeFrame,
   browserLauncherForPlatform,
   OPCODES,
-  MAX_FRAME_PAYLOAD_BYTES
+  MAX_FRAME_PAYLOAD_BYTES,
+  INBOX_DIR
 };

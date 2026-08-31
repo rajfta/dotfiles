@@ -54,11 +54,22 @@ HTML-escape `<`, `>` and `&` inside `<pre>` (`&lt;`, `&gt;`, `&amp;`).
 <div class="options">                       <!-- add data-multiselect for several -->
   <div class="option" data-choice="a" data-recommended onclick="toggleSelect(this)">
     <div class="letter">A</div>
-    <div class="content"><h3>Title</h3><p>One-line consequence.</p></div>
+    <div class="content">
+      <h3>Title</h3><p>One-line consequence.</p>
+      <ul class="trade">
+        <li class="pro">what this buys</li>
+        <li class="con">what it costs</li>
+      </ul>
+    </div>
   </div>
   <div class="option" data-choice="b" onclick="toggleSelect(this)">…</div>
 </div>
 ```
+
+An option card is complete when it has all three parts: title, one-line consequence,
+and its own `.trade` list — one to three ✓ `pro` lines and one to three ✗ `con` lines,
+each a short phrase. The `.trade` list also works inside a `.card-body` or under a
+`gallery` figcaption.
 
 ### gallery — labelled reference images
 
@@ -98,6 +109,8 @@ must be regular files — a symlink or Finder alias is refused with a 404.
   <div class="pros"><h4>Pros</h4><ul><li>…</li></ul></div>
   <div class="cons"><h4>Cons</h4><ul><li>…</li></ul></div>
 </div>
+<!-- .pros-cons weighs a single proposal. On an A/B/C screen the trade-offs
+     live in each option's .trade list instead. -->
 
 <pre class="mermaid">flowchart LR
   Job --> MNB --> DB --> Kafka</pre>

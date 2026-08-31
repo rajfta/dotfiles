@@ -7,7 +7,8 @@ description: Interrogate a decision grilling-style while a local browser tab sho
 
 Grilling with a screen. You walk the user's decision tree one question at a time; when a
 question has a *shape* — an image, two DTOs, a schema, a flow — you put that shape in a
-browser tab first. It ends in a decision record, never in implementation.
+browser tab first. It ends in a decision record; implementation begins only if the user
+says yes to the one closing question.
 
 ## Two ways in
 
@@ -47,7 +48,10 @@ session and carry the decisions made so far into its first `tree.json`.
    it prints. The URL carries the session key — always give the user the **complete** URL.
 3. Write the first `state/tree.json` with the Write tool — never a heredoc — (see
    visual-guide.md): every decision you can already see as `pending`, the first as
-   `current`.
+   `current`. If two or more *whole approaches* would each produce a different tree
+   (batch job vs event consumer vs on-read; new service vs extend existing), the first
+   node is `approach`: put the 2–3 approaches on an options screen and resolve it before
+   any detail question — the detail nodes its answer reveals nest under it.
 4. Tell the user, in one short message: the URL; that the tab opens on the first screen;
    and that **images you should show must be files** — drop them into `inbox_dir`, or drag
    a file into the terminal and you will copy it there. A pasted image cannot be re-shown.
@@ -60,6 +64,8 @@ For each question:
 1. **Look up the facts** the question depends on before asking it.
 2. **Decide the surface.** Ask in the terminal always. *Also* push a screen when the
    content has a shape:
+   - competing options — `options`: each card is a title, a one-line consequence, and
+     that option's own pros (✓) and cons (✗) as a `.trade` list
    - referenced images — `gallery`, labelled, so "Design B" has a name
    - two or more code shapes — `compare`: DTO ↔ zod ↔ Prisma, old ↔ new interface
    - structures — endpoint or field `table`, module or event `mermaid`, state machines
@@ -95,10 +101,30 @@ For each question:
 
 When every node is resolved and the user confirms shared understanding:
 
-1. Write `<session_dir>/decisions.md` from `tree.json` (template in visual-guide.md).
-2. Stop the server: `"$HOME/.claude/skills/cerebro/scripts/stop-server.sh" <session_dir>`.
-3. Print the path of `decisions.md` and a three-line summary. **Stop.** Do not invoke
-   `writing-plans` or any implementation skill — building is the user's next request.
+1. **Self-review the tree, fixing inline:** no placeholder or TBD text; every
+   `rejected[]` entry has a `why`; deferred items live in `followUps`; a `chosen` value
+   readable two ways gets rewritten to the one meaning the user confirmed. Two resolved
+   nodes that contradict each other are one more question, not a silent pick.
+2. Write `<session_dir>/decisions.md` from `tree.json` (template in visual-guide.md).
+3. Stop the server: `"$HOME/.claude/skills/cerebro/scripts/stop-server.sh" <session_dir>`.
+4. Print the path of `decisions.md` and a three-line summary, then close. Steps 1–3
+   come first whatever the user's last message asked for — the record is never skipped.
+   - If their final answer already contained an explicit implementation request ("now
+     add the migration"), that is the yes: proceed, `decisions.md` as the input.
+   - Otherwise ask one closing question — carry the decisions into
+     planning/implementation now? Proceed only on an explicit yes; anything else
+     (silence, "maybe", "sounds good", a new topic) means stop. Never invoke
+     `writing-plans` or any implementation skill uninvited.
+
+## Red flags
+
+| Thought | Reality |
+|---|---|
+| "These last questions are trivial — I'll batch them" | One per message. Trivial questions are where wrong assumptions hide. |
+| "A is obviously right, pros/cons would be noise" | The `.trade` lists are the record's raw material. Every option carries one. |
+| "One approach is clearly best, skip the approach node" | If a second whole approach exists, it goes on screen and gets rejected on the record. |
+| "They sound ready — I'll start building" | "Sounds good" is not a yes. Implementation starts on an explicit request or an explicit yes — and only after the record is written. |
+| "The next question is terminal-only, the tab can stay" | Push `waiting-N.html`; a stale screen presents a resolved choice as open. |
 
 ## Reference
 

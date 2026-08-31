@@ -21,6 +21,14 @@ test('frame has the note form, the tree mount, both placeholders and the mermaid
   assert.match(frame, /integrity="sha384-/);
 });
 
+test('frame provides the per-option trade-off list (.trade) the visual guide documents', () => {
+  for (const sel of ['.trade', '.trade li.pro', '.trade li.con']) {
+    assert.ok(frame.includes(sel), `missing CSS for ${sel}`);
+  }
+  assert.ok(frame.includes("content: '✓'"), 'missing ✓ marker for .trade li.pro');
+  assert.ok(frame.includes("content: '✗'"), 'missing ✗ marker for .trade li.con');
+});
+
 test('helper wires the note form and gallery selection', () => {
   assert.match(helper, /note-form/);
   assert.match(helper, /type: 'note'/);

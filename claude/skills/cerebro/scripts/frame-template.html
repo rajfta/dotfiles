@@ -143,6 +143,13 @@
     .option .content h3 { font-size: 0.95rem; margin-bottom: 0.15rem; }
     .option .content p { color: var(--text-secondary); font-size: 0.85rem; margin: 0; }
 
+    /* ===== TRADE LIST (per-option pros/cons, inside .option/.card content) ===== */
+    .trade { list-style: none; margin: 0.5rem 0 0; padding: 0; font-size: 0.8rem; }
+    .trade li { position: relative; padding-left: 1.2rem; margin-bottom: 0.15rem; color: var(--text-secondary); }
+    .trade li::before { position: absolute; left: 0; font-weight: 600; }
+    .trade li.pro::before { content: '✓'; color: var(--success); }
+    .trade li.con::before { content: '✗'; color: var(--error); }
+
     /* ===== CARDS (for showing designs/mockups) ===== */
     .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; }
     .card {

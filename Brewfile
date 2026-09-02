@@ -15,8 +15,9 @@ brew "git-delta"   # core.pager/delta settings in git/gitconfig
 cask "visual-studio-code" # EDITOR/VISUAL in zsh/zshrc and core.editor in git/gitconfig
 cask "ghostty"     # terminal itself, config in ghostty/config
 cask "hammerspoon" # window management + per-Space wallpaper tint in hammerspoon/init.lua
-cask "spaceman"    # menu-bar Space indicator (Rectangles style); configured via `defaults`
+cask "spaceman"    # menu-bar Space indicator; settings in macos/dev.jaysce.Spaceman.plist
 cask "supacode"    # settings synced by supacode/sync-settings.sh
+cask "maccy"       # clipboard manager; settings in macos/org.p0deje.Maccy.plist
 
 # --- general terminal tools, not referenced by config but commonly paired ---
 brew "ripgrep"     # fast grep, pairs well with fzf

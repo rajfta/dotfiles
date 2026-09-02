@@ -22,6 +22,7 @@ locations in `$HOME`. Editing the symlinked file edits the file in this repo.
 | Claude Code (theme) | `claude/themes/tailwind-theme.json` | `~/.claude/themes/tailwind-theme.json` |
 | Claude Code (skill: cerebro) | `claude/skills/cerebro/` | `~/.claude/skills/cerebro` |
 | [Supacode](https://supacode.sh/) | `supacode/settings.json` | `~/.supacode/settings.json` (merged, not linked — see below) |
+| [Maccy](https://maccy.app/) / [Spaceman](https://jaysce.dev/projects/spaceman) | `macos/<domain>.plist` | the macOS `defaults` database (written, not linked — see below) |
 
 `~/.claude/settings.json` is **not** symlinked — Claude Code rewrites that file
 itself (changing model, theme or effort via `/config` rewrites it, which would
@@ -142,3 +143,54 @@ replaced wholesale, so removing a rebind here actually removes it there.
 Not covered: window geometry and onboarding flags in
 `~/Library/Preferences/app.supabit.supacode.plist`. That is local state, not
 configuration, so it stays per-machine.
+
+## App preferences with no config file (Maccy, Spaceman)
+
+Maccy (clipboard manager) and Spaceman (menu-bar Space indicator) have no
+config file to symlink — every preference lives in the macOS `defaults`
+database, which is why they were invisible to this repo. Missing the cask *and*
+the settings, a new machine simply ended up without the app.
+
+`macos/defaults.sh` tracks the portable half of those domains as one plist per
+app, `macos/<domain>.plist`:
+
+```sh
+./macos/defaults.sh pull     # after changing settings in the app's UI, then commit
+./macos/defaults.sh apply    # on the other laptop (install.sh does this too)
+```
+
+**Quit the app before running either direction** — macOS caches defaults in
+`cfprefsd` and an app rewrites its own domain on quit, which would clobber an
+apply. Relaunch afterwards to pick new values up.
+
+What is deliberately *not* tracked, as it is per-machine state rather than
+configuration: Sparkle updater bookkeeping (`SU*`), remembered window geometry
+(`NSWindow Frame*`), menu-bar item position (`NSStatusItem*`), and the app's own
+upgrade markers. The ignore list is at the top of the script.
+
+**Sandboxed apps are a special case.** Maccy is sandboxed, so its preferences
+live in its own container, not `~/Library/Preferences` — a plain
+`defaults write org.p0deje.Maccy ...` would land in a file Maccy never reads.
+Entries in `DOMAINS` are suffixed `:sandboxed` to target the container path
+instead. Check before adding an app:
+
+```sh
+codesign -d --entitlements - --xml /Applications/<App>.app | plutil -p - | grep app-sandbox
+```
+
+(Maccy is `true`, Spaceman is `false`.) `apply` creates the container prefs
+directory if the app has never run, so settings can be staged before first
+launch, and it runs `killall cfprefsd` afterwards — macOS caches preferences in
+that daemon and would otherwise write its stale copy back over the file.
+
+`apply` writes key by key rather than using `defaults import`, which would
+replace the whole domain — so untracked keys in the live domain (updater state,
+anything a newer app version added) survive. Both directions skip an app that
+isn't installed yet, so adding a new one is: add the cask to the `Brewfile`, add
+its domain to `DOMAINS` in the script, configure it once in the UI, then `pull`.
+
+Maccy's own settings were never captured before this existed, so there is
+nothing to restore from the old machine — `brew bundle` installs the app, and
+the first `pull` after you configure it starts tracking. A freshly installed
+Maccy writes no preferences at all until a setting is changed, so `pull` will
+report it as having none until then.

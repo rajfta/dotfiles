@@ -99,6 +99,14 @@ if [ -x "$DOTFILES_DIR/supacode/sync-settings.sh" ]; then
   "$DOTFILES_DIR/supacode/sync-settings.sh" apply
 fi
 
+# Apps with no config file of their own (Maccy, Spaceman) keep preferences in
+# the macOS defaults database. Push the tracked ones into it. A domain we have
+# nothing for yet is skipped, so this is a no-op until the app is configured
+# once and `pull`ed.
+if [ -x "$DOTFILES_DIR/macos/defaults.sh" ]; then
+  "$DOTFILES_DIR/macos/defaults.sh" apply
+fi
+
 for ctx in $WORK_CONTEXTS; do
   template="git/gitconfig-$ctx.example"
   if [ ! -e "$DOTFILES_DIR/$template" ]; then

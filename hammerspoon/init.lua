@@ -141,10 +141,8 @@ end)
 
 bindKey({"ctrl"}, "5", function()
   cycleApps({
-    "com.hnc.Discord",            -- Discord
-    "net.whatsapp.WhatsApp",      -- WhatsApp
-    "ru.keepcoder.Telegram",      -- Telegram
     "com.tinyspeck.slackmacgap",  -- Slack
+    "com.tdesktop.Telegram",      -- Telegram
   })
 end)
 

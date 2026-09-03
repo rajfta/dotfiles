@@ -1,8 +1,25 @@
+# Template for ~/.gitconfig-myedspace -- used by repos under ~/work/myedspace/.
+# install.sh copies this once; fill in the real values there, not here.
+# Pairs with the github-myedspace alias in ~/.ssh/config (see README).
 [user]
 	email = TODO_MYEDSPACE_EMAIL
 	name = TODO_MYEDSPACE_NAME
-	signingkey = ~/.ssh/TODO_MYEDSPACE_KEY.pub
+	signingkey = ~/.ssh/id_ed25519_myedspace.pub
+
+# Send github.com remotes through the work-key alias, scoped to this context so
+# personal repos on the same machine keep using the personal key.
+[url "git@github-myedspace:"]
+	insteadOf = git@github.com:
+	insteadOf = https://github.com/
+	insteadOf = ssh://git@github.com/
+
+# The signing pubkey must be added to the work GitHub account twice:
+# once as an Authentication key, once as a Signing key.
 [gpg]
 	format = ssh
+[gpg "ssh"]
+	allowedSignersFile = ~/.ssh/allowed_signers
 [commit]
+	gpgsign = true
+[tag]
 	gpgsign = true

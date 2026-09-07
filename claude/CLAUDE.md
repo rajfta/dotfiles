@@ -15,3 +15,8 @@ collapses or drops several constructs, so prefer the ones that survive:
 - **Tables, blockquotes, and fenced code render well.** Reach for these when
   something needs to stand out.
 - Inline `code`, **bold**, *italic* and ~~strikethrough~~ all render correctly.
+
+## Concision
+
+Be extremely concise when reporting information to me. Sacrifice grammar for
+concision — fragments, dropped articles and clipped sentences are fine.

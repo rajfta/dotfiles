@@ -100,7 +100,7 @@ end
 -- won't hand over; once it does release the combo, the hotkey path wins again
 -- on its own with no change here.
 local allMods = {"cmd", "ctrl", "alt", "shift", "fn"}
-local fallbackTaps = {} -- keep references so the taps aren't garbage-collected
+fallbackTaps = {} -- global, so the taps aren't garbage-collected
 
 local function bindKey(mods, key, fn)
   if hs.hotkey.new(mods, key, fn):enable() then return end

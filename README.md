@@ -20,7 +20,6 @@ locations in `$HOME`. Editing the symlinked file edits the file in this repo.
 | Claude Code (status line) | `claude/statusline-command.sh` | `~/.claude/statusline-command.sh` |
 | Claude Code (global instructions) | `claude/CLAUDE.md` | `~/.claude/CLAUDE.md` |
 | Claude Code (theme) | `claude/themes/tailwind-theme.json` | `~/.claude/themes/tailwind-theme.json` |
-| Claude Code (skill: cerebro) | `claude/skills/cerebro/` | `~/.claude/skills/cerebro` |
 | [Supacode](https://supacode.sh/) | `supacode/settings.json` | `~/.supacode/settings.json` (merged, not linked — see below) |
 | [Maccy](https://maccy.app/) / [Spaceman](https://jaysce.dev/projects/spaceman) | `macos/<domain>.plist` | the macOS `defaults` database (written, not linked — see below) |
 

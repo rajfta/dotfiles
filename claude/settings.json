@@ -4,7 +4,6 @@
     "command": "bash ~/.claude/statusline-command.sh"
   },
   "enabledPlugins": {
-    "atlassian@claude-plugins-official": true,
     "cc-plugin-you-should-know@builtin": true,
     "code-review@claude-plugins-official": true,
     "context7@claude-plugins-official": true,

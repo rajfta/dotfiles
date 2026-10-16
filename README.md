@@ -41,6 +41,8 @@ plugin that isn't installed at user scope (via the `claude plugin` CLI), so a
 new machine gets the same plugins — e.g. Addy Osmani's
 [agent-skills](https://github.com/addyosmani/agent-skills) — with no `/plugin`
 steps. Removing a plugin here doesn't uninstall it elsewhere; do that by hand.
+Work-only plugins (atlassian) are listed in `LOCAL_PLUGINS` in the script, so
+`pull` never carries them to other machines.
 
 The status line script renders two lines: `~/dir  branch*` (dir + git branch,
 `*` = dirty working tree) and `Model · effort · ctx N%` (context % goes

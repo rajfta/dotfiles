@@ -16,6 +16,8 @@ set -euo pipefail
 REPO_FILE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/settings.json"
 LIVE_FILE="$HOME/.claude/settings.json"
 KEYS='["enabledPlugins", "extraKnownMarketplaces", "statusLine", "theme"]'
+# Plugins enabled on this machine that pull must not carry to others (work-only).
+LOCAL_PLUGINS='["atlassian@claude-plugins-official"]'
 
 command -v jq >/dev/null || { echo "sync-settings: jq is required (brew install jq)" >&2; exit 1; }
 
@@ -58,8 +60,12 @@ install_missing_plugins() {
 case "${1:-}" in
   pull)
     [ -f "$LIVE_FILE" ] || { echo "sync-settings: no $LIVE_FILE to pull from" >&2; exit 1; }
-    jq --argjson keys "$KEYS" 'with_entries(select(.key as $k | $keys | index($k)))' \
-      "$LIVE_FILE" > "$REPO_FILE"
+    jq --argjson keys "$KEYS" --argjson local "$LOCAL_PLUGINS" '
+      with_entries(select(.key as $k | $keys | index($k)))
+      | if has("enabledPlugins")
+        then .enabledPlugins |= with_entries(select(.key as $k | $local | index($k) | not))
+        else . end
+    ' "$LIVE_FILE" > "$REPO_FILE"
     echo "pull: $LIVE_FILE -> claude/settings.json"
     ;;
   apply)

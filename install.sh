@@ -92,6 +92,12 @@ link "claude/statusline-command.sh" "$HOME/.claude/statusline-command.sh"
 link "claude/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
 link "claude/themes/tailwind-theme.json" "$HOME/.claude/themes/tailwind-theme.json"
 
+# Claude Code rewrites ~/.claude/settings.json itself, so merge our tracked
+# keys (plugins, status line, theme) into it and install missing plugins.
+if [ -x "$DOTFILES_DIR/claude/sync-settings.sh" ]; then
+  "$DOTFILES_DIR/claude/sync-settings.sh" apply
+fi
+
 # Supacode owns ~/.supacode/settings.json and rewrites it as you use the app,
 # so it can't be a symlink. Merge our tracked "global" block into it instead.
 if [ -x "$DOTFILES_DIR/supacode/sync-settings.sh" ]; then

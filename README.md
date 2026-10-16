@@ -20,21 +20,27 @@ locations in `$HOME`. Editing the symlinked file edits the file in this repo.
 | Claude Code (status line) | `claude/statusline-command.sh` | `~/.claude/statusline-command.sh` |
 | Claude Code (global instructions) | `claude/CLAUDE.md` | `~/.claude/CLAUDE.md` |
 | Claude Code (theme) | `claude/themes/tailwind-theme.json` | `~/.claude/themes/tailwind-theme.json` |
+| Claude Code (plugins, status line, theme settings) | `claude/settings.json` | `~/.claude/settings.json` (merged, not linked — see below) |
 | [Supacode](https://supacode.sh/) | `supacode/settings.json` | `~/.supacode/settings.json` (merged, not linked — see below) |
 | [Maccy](https://maccy.app/) / [Spaceman](https://jaysce.dev/projects/spaceman) | `macos/<domain>.plist` | the macOS `defaults` database (written, not linked — see below) |
 
 `~/.claude/settings.json` is **not** symlinked — Claude Code rewrites that file
-itself (changing model, theme or effort via `/config` rewrites it, which would
-clobber a symlink), and it holds machine-local plugin state. So on a new machine
-add these two keys to it manually to wire up the status line and the theme:
+itself (`/config`, `/plugin`, model and effort changes), which would clobber a
+symlink, and most of it is machine-local. Instead `claude/settings.json` tracks
+just the portable keys — `enabledPlugins`, `extraKnownMarketplaces`,
+`statusLine`, `theme` — and `claude/sync-settings.sh` merges them in:
 
-```json
-"statusLine": {
-  "type": "command",
-  "command": "bash ~/.claude/statusline-command.sh"
-},
-"theme": "custom:tailwind-theme"
+```sh
+./claude/sync-settings.sh pull    # after /plugin install, /config theme etc., then commit
+./claude/sync-settings.sh apply   # on a new machine (install.sh does this too)
 ```
+
+`apply` deep-merges, so other local settings and plugins enabled only on that
+machine survive. It then adds any missing marketplace and installs any enabled
+plugin that isn't installed at user scope (via the `claude plugin` CLI), so a
+new machine gets the same plugins — e.g. Addy Osmani's
+[agent-skills](https://github.com/addyosmani/agent-skills) — with no `/plugin`
+steps. Removing a plugin here doesn't uninstall it elsewhere; do that by hand.
 
 The status line script renders two lines: `~/dir  branch*` (dir + git branch,
 `*` = dirty working tree) and `Model · effort · ctx N%` (context % goes
